@@ -97,11 +97,6 @@ INSERT INTO classrooms (room_number, building, floor, department, semester, sect
 ('409', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-E', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
 ('410', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-F', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant');
 
--- FIX: Using a temporary staging table instead of VALUES() inside JOIN
--- (MySQL does NOT support: JOIN (SELECT * FROM (VALUES ...)) syntax)
--- This approach is fully MySQL 5.7+ / 8.0+ compatible and uses only
--- standard INSERT, CREATE TEMPORARY TABLE, SELECT, JOIN as per DBMS syllabus.
-
 CREATE TEMPORARY TABLE tmp_schedule (
   room_number VARCHAR(10),
   day         ENUM('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'),
