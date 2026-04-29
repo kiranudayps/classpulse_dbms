@@ -1,22 +1,7 @@
--- ================================================================
--- NIE ClassPulse — MySQL Database Schema and Queries (FIXED)
--- ================================================================
--- Lab Experiments Covered:
--- Exp 1: DDL, Constraints (CREATE TABLE, PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE)
--- Exp 2: DML, Rollback (Start Transaction block at the bottom)
--- Exp 3: Aggregates (COUNT, MAX, MIN, SUM in utilisation view)
--- Exp 4: Joins (Used in views and queries)
--- Exp 5: Subqueries (Used in 'available_rooms' stored procedure)
--- Exp 6: Set Operations (UNION query example at the end)
--- Exp 7: Views (3 views created)
--- Exp 8: Trigger (AFTER UPDATE trigger for room_audit)
--- ================================================================
-
 DROP DATABASE IF EXISTS nie_classpulse;
 CREATE DATABASE nie_classpulse;
 USE nie_classpulse;
 
--- ── 1. USERS ────────────────────────────────────────────────
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -26,12 +11,10 @@ CREATE TABLE users (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- DEFAULT USERS
 INSERT INTO users (email, password, full_name, role) VALUES 
 ('admin@nie.ac.in', 'password123', 'Admin User', 'teacher'),
 ('staff@nie.ac.in', 'staff123', 'Staff User', 'teacher');
 
--- ── 2. CLASSROOMS ──────────────────────────────────────────────
 CREATE TABLE classrooms (
   id INT AUTO_INCREMENT PRIMARY KEY,
   room_number VARCHAR(10) NOT NULL UNIQUE,
@@ -51,7 +34,6 @@ CREATE TABLE classrooms (
   CONSTRAINT chk_capacity CHECK (capacity > 0)
 );
 
--- ── 3. SCHEDULES ───────────────────────────────────────────────
 CREATE TABLE schedules (
   id INT AUTO_INCREMENT PRIMARY KEY,
   room_id INT,
@@ -65,7 +47,6 @@ CREATE TABLE schedules (
   FOREIGN KEY (room_id) REFERENCES classrooms(id) ON DELETE CASCADE
 );
 
--- ── 4. ROOM AUDIT (Trigger Target) ──────────────────────────────
 CREATE TABLE room_audit (
   audit_id INT AUTO_INCREMENT PRIMARY KEY,
   room_id INT,
@@ -75,7 +56,6 @@ CREATE TABLE room_audit (
   FOREIGN KEY (room_id) REFERENCES classrooms(id) ON DELETE CASCADE
 );
 
--- ── 5. CLASSROOM DATA (All 39 rooms) ──────────────────────────────────────────
 INSERT INTO classrooms (room_number, building, floor, department, semester, section, capacity, facilities, status) VALUES
 ('101', 'Ramanujacharya Block', 'Ground Floor', 'CSE', '2nd', '2nd CSE-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
 ('107', 'Ramanujacharya Block', 'Ground Floor', 'CSE', '2nd', '2nd CSE-B', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
@@ -117,7 +97,6 @@ INSERT INTO classrooms (room_number, building, floor, department, semester, sect
 ('409', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-E', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
 ('410', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-F', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant');
 
--- ── 6. SCHEDULE DATA ─────────────────────────────────────────
 -- FIX: Using a temporary staging table instead of VALUES() inside JOIN
 -- (MySQL does NOT support: JOIN (SELECT * FROM (VALUES ...)) syntax)
 -- This approach is fully MySQL 5.7+ / 8.0+ compatible and uses only
@@ -1191,8 +1170,6 @@ INSERT INTO tmp_schedule (room_number, day, start_time, end_time, subject, secti
 ('210', 'Friday', '14:30', '15:30', 'CN Lab', '6th CSE-E', '6th'),
 ('210', 'Friday', '15:30', '16:30', 'CN Lab', '6th CSE-E', '6th');
 
--- Populate schedules using JOIN between tmp_schedule and classrooms
--- This correctly maps room_number -> room_id for every row
 INSERT INTO schedules (room_id, room_number, day, start_time, end_time, subject, section, semester)
 SELECT c.id, t.room_number, t.day, t.start_time, t.end_time, t.subject, t.section, t.semester
 FROM tmp_schedule t
@@ -1200,8 +1177,6 @@ JOIN classrooms c ON c.room_number = t.room_number;
 
 DROP TEMPORARY TABLE tmp_schedule;
 
--- ── 7. VIEWS ───────────────────────────────────────────────────
--- View 1: Full Schedule Detail
 CREATE VIEW view_full_schedule AS
 SELECT 
     s.id, c.room_number, c.building, c.department,
@@ -1209,20 +1184,16 @@ SELECT
 FROM schedules s
 JOIN classrooms c ON s.room_id = c.id;
 
--- View 2: Vacant Rooms Currently
 CREATE VIEW view_vacant_rooms AS
 SELECT room_number, building, floor, department, capacity
 FROM classrooms
 WHERE status = 'vacant';
 
--- View 3: Occupied Rooms Dashboard View
 CREATE VIEW view_occupied_rooms AS
 SELECT room_number, building, department, current_subject, session_start, session_end 
 FROM classrooms 
 WHERE status = 'occupied';
 
--- ── 8. TRIGGERS ────────────────────────────────────────────────
--- Trigger 1: Status Audit (Exp 8)
 DELIMITER $$
 CREATE TRIGGER trg_after_room_update
 AFTER UPDATE ON classrooms
@@ -1235,8 +1206,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- ── 9. STORED PROCEDURES ───────────────────────────────────────
--- SP 1: Available Rooms By Time
 DELIMITER $$
 CREATE PROCEDURE sp_available_rooms(IN check_day VARCHAR(15), IN check_time TIME)
 BEGIN
@@ -1250,7 +1219,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- SP 2: Schedule For Room
 DELIMITER $$
 CREATE PROCEDURE sp_room_schedule(IN p_room_id INT)
 BEGIN
@@ -1261,8 +1229,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- ── 10. EVENTS ─────────────────────────────────────────────────
--- Replaces Supabase Edge Function to reset rooms
 SET GLOBAL event_scheduler = ON;
 
 DELIMITER $$
@@ -1270,20 +1236,8 @@ CREATE EVENT evt_sync_room_status
 ON SCHEDULE EVERY 5 MINUTE
 DO
 BEGIN
-    -- Reset occupied rooms past their end time
     UPDATE classrooms
     SET status = 'vacant', current_subject = NULL, current_faculty = NULL, session_start = NULL, session_end = NULL
     WHERE status = 'occupied' AND session_end < CURRENT_TIME();
 END $$
 DELIMITER ;
-
--- ── 11. EXTRA QUERIES FOR DEMO (Set Ops & Subqueries) ─────────
--- UNION Example: Get all entity labels from different tables
--- SELECT room_number as EntityName FROM classrooms
--- UNION
--- SELECT subject as EntityName FROM schedules;
-
--- ROLLBACK Demo (Run manually if needed):
--- START TRANSACTION;
--- UPDATE classrooms SET status='occupied' WHERE id=1;
--- ROLLBACK;
