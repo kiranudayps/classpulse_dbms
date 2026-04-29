@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode:'class',
+      theme:{ extend:{ colors:{ primary:"#137fec" }, fontFamily:{ display:["Lexend"] } } }
+    }
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+  </script>
+  <title>Room Schedule — NIE ClassPulse</title>
+  <style>
+    body{ font-family:'Lexend',sans-serif; }
+    .loader{ width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#137fec;border-radius:50%;animation:spin .8s linear infinite; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .pulse-dot{ width:8px;height:8px;background:#ef4444;border-radius:50%;animation:pdot 1.2s ease-in-out infinite;display:inline-block; }
+    @keyframes pdot{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+    /* Fix time input in dark mode */
+    input[type="time"] {
+      color-scheme: light;
+    }
+    .dark input[type="time"] {
+      color-scheme: dark;
+      background-color: #334155;
+      color: #f1f5f9;
+      border-color: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined">arrow_back</span>
+      <span class="font-medium text-sm">Back</span>
+    </a>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <!-- NEW LOGO -->
+        <img src="/logo.png" alt="NIE ClassPulse" class="h-9 w-9 rounded-xl object-cover" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'"/>
+        <div id="logo-fallback" style="display:none" class="bg-primary p-1.5 rounded-lg text-white">
+          <span class="material-symbols-outlined text-sm">pulse_alert</span>
+        </div>
+        <span class="font-bold">NIE ClassPulse</span>
+      </div>
+      <button id="theme-btn" onclick="toggleTheme()"
+              class="size-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+        <span id="theme-icon" class="material-symbols-outlined text-slate-600 dark:text-slate-300 text-xl">dark_mode</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8 pb-10">
+  <div id="loading" class="flex justify-center py-20"><div class="loader"></div></div>
+
+  <div id="content" class="hidden">
+
+    <!-- Room header -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-8 mb-6 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div class="flex-1">
+          <h1 id="room-number" class="text-3xl sm:text-4xl font-bold">—</h1>
+          <p id="room-location" class="text-slate-500 dark:text-slate-400 mt-1">—</p>
+          <div id="status-badge" class="mt-3"></div>
+
+          <div id="current-session" class="hidden mt-4 p-4 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900 rounded-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="pulse-dot"></span>
+              <p class="text-xs text-red-500 uppercase font-bold">Ongoing Class</p>
+            </div>
+            <p id="cs-subject" class="font-bold text-slate-900 dark:text-slate-100 text-lg"></p>
+            <p id="cs-section" class="text-sm font-medium text-primary mt-0.5"></p>
+            <p id="cs-time" class="text-sm text-slate-500 dark:text-slate-400 mt-0.5"></p>
+          </div>
+        </div>
+
+        <!-- Editor panel -->
+        <div id="editor-panel" class="hidden bg-slate-50 dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 w-full md:min-w-72 md:max-w-xs">
+          <p class="text-xs text-slate-500 uppercase font-bold mb-3">Override Room Status</p>
+
+          <div id="panel-occupy" class="hidden space-y-3">
+            <p class="text-xs text-slate-500 mb-2">Room is free — assign it to your class:</p>
+            <input id="inp-subject" placeholder="Subject name *" type="text"
+                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-primary outline-none"/>
+            <input id="inp-faculty" placeholder="Faculty name (optional)" type="text"
+                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-primary outline-none"/>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="text-xs text-slate-400 mb-1 block">Start Time</label>
+                <input id="inp-start" type="time"
+                       class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-primary outline-none"/>
+              </div>
+              <div class="flex-1">
+                <label class="text-xs text-slate-400 mb-1 block">End Time</label>
+                <input id="inp-end" type="time"
+                       class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-primary outline-none"/>
+              </div>
+            </div>
+            <button id="btn-occupy"
+                    class="w-full bg-red-500 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-base">lock</span>Mark as Occupied
+            </button>
+          </div>
+
+          <div id="panel-vacate" class="hidden">
+            <p class="text-xs text-slate-500 mb-3">Class cancelled? Free this room:</p>
+            <button id="btn-vacate"
+                    class="w-full bg-green-500 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-base">lock_open</span>Mark as Vacant
+            </button>
+            <p class="text-xs text-slate-400 mt-2 text-center">Timetable will auto-restore at next slot.</p>
+          </div>
+
+          <p id="update-msg" class="text-xs text-center mt-3 h-4"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Schedule -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 mb-6">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-primary">calendar_today</span>
+        <h2 class="text-base font-bold">Today's Class Schedule</h2>
+      </div>
+      <p class="text-xs text-slate-400 mb-5 ml-8">Lab hours not shown — students go to the lab during those slots.</p>
+      <div id="schedule-list">
+        <div class="flex justify-center py-6"><div class="loader"></div></div>
+      </div>
+    </div>
+
+    <!-- Full Week Schedule -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6">
+      <div class="flex items-center gap-2 mb-5">
+        <span class="material-symbols-outlined text-primary">calendar_month</span>
+        <h2 class="text-base font-bold">Full Week Schedule</h2>
+      </div>
+      <div id="week-schedule">
+        <div class="flex justify-center py-6"><div class="loader"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-state" class="hidden text-center py-20">
+    <span class="material-symbols-outlined text-5xl text-slate-300 block mb-3">error</span>
+    <p class="text-slate-500">Room not found.</p>
+    <a href="/" class="text-primary text-sm mt-2 inline-block hover:underline">← Go back</a>
+  </div>
+</main>
+
+<script>
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+  });
+</script>
+
+<script type="module">
+  import { getRoomById, updateRoomStatus } from '/js/rooms.js';
+  import { fetchFromApi }                  from '/js/api.js';
+  import { getUserRole }                   from '/js/auth.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const roomId = params.get('id');
+  if (!roomId) { showError(); } else { load(); }
+
+  function showError() {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('error-state').classList.remove('hidden');
+  }
+
+  function isLab(subject) { return /lab/i.test(subject || ''); }
+
+  function formatTime(time) {
+    if (!time) return '';
+    const [h, m] = time.split(':');
+    let hour = parseInt(h);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${m} ${ampm}`;
+  }
+
+  // IST time string
+  function nowTimeStr() {
+    const now = new Date();
+    const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000) - (now.getTimezoneOffset() * 60 * 1000));
+    return `${String(ist.getHours()).padStart(2,'0')}:${String(ist.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function todayIST() {
+    const now = new Date();
+    const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000) - (now.getTimezoneOffset() * 60 * 1000));
+    return ist.toLocaleDateString('en-US', { weekday: 'long' });
+  }
+
+  async function fetchAllSchedules(roomId) {
+    return await fetchFromApi(`/room/${roomId}/schedule`);
+  }
+
+  // FIXED: re-fetch room fully from API on any interval
+  function subscribeToRoom(roomId) {
+    setInterval(async () => {
+      try {
+        const fresh = await getRoomById(roomId);
+        refreshRoomUI(fresh);
+      } catch(err) {
+        console.error(err);
+      }
+    }, 10000);
+  }
+
+  function refreshRoomUI(room) {
+    // Update badge
+    const badge = document.getElementById('status-badge');
+    const isVacant = room.status === 'vacant';
+    const badgeCls = isVacant
+      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+    badge.innerHTML = `<span class="${badgeCls} text-sm font-bold px-3 py-1 rounded-full uppercase">${isVacant ? 'Vacant' : 'Occupied'}</span>`;
+
+    // Update session info
+    const sessionEl = document.getElementById('current-session');
+    if (!isVacant && room.current_subject) {
+      sessionEl.classList.remove('hidden');
+      document.getElementById('cs-subject').textContent = room.current_subject;
+      document.getElementById('cs-section').textContent = room.section ?? '';
+      document.getElementById('cs-time').textContent =
+        room.session_start ? `${formatTime(room.session_start)} – ${formatTime(room.session_end)}` : '';
+    } else {
+      sessionEl.classList.add('hidden');
+    }
+
+    // Swap editor panel buttons
+    const panelOccupy = document.getElementById('panel-occupy');
+    const panelVacate = document.getElementById('panel-vacate');
+    if (panelOccupy && panelVacate) {
+      panelOccupy.classList.toggle('hidden', !isVacant);
+      panelVacate.classList.toggle('hidden', isVacant);
+    }
+  }
+
+  async function load() {
+    try {
+      const [room, role, allSchedules] = await Promise.all([
+        getRoomById(roomId),
+        getUserRole(),
+        fetchAllSchedules(roomId),
+      ]);
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('content').classList.remove('hidden');
+
+      document.getElementById('room-number').textContent   = room.room_number;
+      document.getElementById('room-location').textContent = `${room.building} • ${room.floor}`;
+
+      refreshRoomUI(room);
+
+      if (role === 'teacher' || role === 'cr') {
+        document.getElementById('editor-panel').classList.remove('hidden');
+        bindEditor(room);
+      }
+
+      renderTodaySchedule(allSchedules);
+      renderWeekSchedule(allSchedules);
+      subscribeToRoom(roomId);
+
+    } catch (err) {
+      console.error(err);
+      showError();
+    }
+  }
+
+  function renderTodaySchedule(allSchedules) {
+    // Requirements specified: REMOVE any filtering based on current day
+    // This element will be hidden or cleared, relying on full grouped mode.
+    const container = document.getElementById('schedule-list').parentElement;
+    if (container) container.style.display = 'none';
+  }
+
+  const DAYS_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
+
+
+  function renderWeekSchedule(data) {
+    const el = document.getElementById('week-schedule');
+
+    const grouped = {
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: []
+    };
+
+    data.forEach(item => {
+      // Map backend fields correctly:
+      item.startTime = item.start_time;
+      item.endTime = item.end_time;
+      
+      if (grouped[item.day]) {
+        grouped[item.day].push(item);
+      }
+    });
+
+    el.innerHTML = Object.keys(grouped).map(day => {
+      const slots = grouped[day];
+
+      const slotsHtml = slots.length > 0
+        ? slots.map(item => `
+              <div class="flex gap-3 text-sm py-2">
+                <span class="text-slate-400 w-24 sm:w-32 shrink-0 text-xs pt-0.5">${formatTime(item.start_time)} - ${formatTime(item.end_time)}</span>
+                <div>
+                  <span class="font-semibold text-slate-800 dark:text-slate-200">${item.subject} (${item.section})</span>
+                </div>
+              </div>`).join('')
+        : '<p class="text-xs text-slate-400 py-1">No regular classes</p>';
+
+      return `
+        <div class="mb-6">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-400">${day}</span>
+          </div>
+          <div class="pl-3 border-l-2 border-slate-200 dark:border-slate-700">
+            ${slotsHtml}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function bindEditor(room) {
+    const msg = document.getElementById('update-msg');
+
+    document.getElementById('btn-occupy')?.addEventListener('click', async () => {
+      const subject = document.getElementById('inp-subject').value.trim();
+      const faculty = document.getElementById('inp-faculty').value.trim();
+      const start   = document.getElementById('inp-start').value;
+      const end     = document.getElementById('inp-end').value;
+      if (!subject) { msg.style.color='red'; msg.textContent='⚠️ Enter a subject name.'; return; }
+
+      const btn = document.getElementById('btn-occupy');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        await updateRoomStatus(room.id, 'occupied', { subject, faculty, start, end });
+        msg.style.color = 'green';
+        msg.textContent = '✅ Room marked occupied!';
+        // Reload page after short delay so UI refreshes fully
+        setTimeout(() => location.reload(), 1000);
+      } catch(e) {
+        msg.style.color = 'red';
+        msg.textContent = e.message;
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-base">lock</span>Mark as Occupied';
+      }
+    });
+
+    document.getElementById('btn-vacate')?.addEventListener('click', async () => {
+      const btn = document.getElementById('btn-vacate');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      try {
+        await updateRoomStatus(room.id, 'vacant');
+        msg.style.color = 'green';
+        msg.textContent = '✅ Room is now vacant!';
+        setTimeout(() => location.reload(), 1000);
+      } catch(e) {
+        msg.style.color = 'red';
+        msg.textContent = e.message;
+        btn.disabled = false;
+      }
+    });
+  }
+</script>
+</body>
+</html>

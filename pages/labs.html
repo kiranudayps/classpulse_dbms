@@ -1,0 +1,2944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode:'class',
+      theme:{ extend:{ colors:{ primary:"#137fec" }, fontFamily:{ display:["Lexend"] } } }
+    }
+  </script>
+  <title>Lab Schedule — NIE ClassPulse</title>
+  <style>
+    body { font-family:'Lexend',sans-serif; }
+    .now-glow { box-shadow: 0 0 20px rgba(19,127,236,0.35); }
+    .tabs-scroll { scrollbar-width:none; -ms-overflow-style:none; }
+    .tabs-scroll::-webkit-scrollbar { display:none; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
+
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <img src="/logo.png" alt="NIE ClassPulse" class="h-9 w-9 rounded-xl object-cover" onerror="this.style.display='none'"/>
+      <div>
+        <h1 class="text-lg font-bold">Lab Schedule</h1>
+        <p class="text-xs text-slate-400">NIE ClassPulse · Even Semester 2025-26</p>
+      </div>
+    </div>
+    <button onclick="toggleTheme()" class="size-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+      <span id="theme-icon" class="material-symbols-outlined text-slate-600 dark:text-slate-300 text-xl">dark_mode</span>
+    </button>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 pb-24">
+
+  <div class="mb-6">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="size-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+        <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">science</span>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold">Lab Sessions</h2>
+        <p class="text-sm text-slate-400">Which class has which lab and when</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
+      <span class="material-symbols-outlined text-amber-500 text-sm">info</span>
+      <p class="text-xs text-amber-700 dark:text-amber-400">During lab hours the classroom is <strong>vacant</strong> — students are in the lab. Read-only info.</p>
+    </div>
+  </div>
+
+  <!-- Day Tabs -->
+  <div class="tabs-scroll flex gap-2 mb-4 overflow-x-auto pb-1">
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-white whitespace-nowrap shrink-0" data-day="all">All Days</button>
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0" data-day="Monday">Monday</button>
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0" data-day="Tuesday">Tuesday</button>
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0" data-day="Wednesday">Wednesday</button>
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0" data-day="Thursday">Thursday</button>
+    <button class="day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0" data-day="Friday">Friday</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row gap-2 mb-5">
+    <select id="filter-sem" class="w-full sm:w-auto px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:ring-2 focus:ring-primary outline-none">
+      <option value="all">All Semesters</option>
+      <option value="II">2nd Semester</option>
+      <option value="IV">4th Semester</option>
+      <option value="VI">6th Semester</option>
+    </select>
+    <select id="filter-dept" class="w-full sm:w-auto px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:ring-2 focus:ring-primary outline-none">
+      <option value="all">All Departments</option>
+      <option value="CSE">CSE</option>
+      <option value="ISE">ISE</option>
+      <option value="AIML">CSE (AI&ML)</option>
+    </select>
+    <div class="relative flex-1 min-w-0">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base">search</span>
+      <input id="lab-search" type="text" placeholder="Search lab, section, batch..."
+             class="w-full pl-9 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary outline-none"/>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2 mb-4">
+    <span class="material-symbols-outlined text-purple-500 text-base">science</span>
+    <span class="font-bold text-sm">Lab Sessions</span>
+    <span id="lab-count" class="text-slate-400 text-sm"></span>
+  </div>
+
+  <div id="lab-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="empty-state" class="hidden text-center py-16">
+    <span class="material-symbols-outlined text-5xl text-slate-300 block mb-3">search_off</span>
+    <p class="text-slate-400">No lab sessions found</p>
+  </div>
+</main>
+
+<script>
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('theme-icon').textContent =
+    document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+});
+</script>
+
+<script>
+const LAB_DATA = [
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "IDT Lab",
+    "lab_room": "IDT LAB",
+    "batch": "All",
+    "instructors": "Dr.SKS + PYK + Dr.MM + EC1",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1 & B2 together"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "A1",
+    "instructors": "Dr. Sayantan Halder (SH)",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "CHE LAB-A1 / PLC LAB-A2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "A2",
+    "instructors": "Miss Bhagyashree Katti (BK)",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "CHE LAB-A1 / PLC LAB-A2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "A1",
+    "instructors": "Miss Bhagyashree Katti (BK)",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "15:30",
+    "notes": "PLC LAB-A1"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "A2",
+    "instructors": "Dr. Sayantan Halder (SH)",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "CHE LAB-A2"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "B1",
+    "instructors": "Dr. Snigdharani Panda (SR)",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-B1 / PLC LAB-B2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "B2",
+    "instructors": "Ms. Kavitha S (KS)",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-B1 / PLC LAB-B2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "IDT Lab",
+    "lab_room": "IDT LAB",
+    "batch": "All",
+    "instructors": "Dr.SKS + EC2 + PYK + EC3",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1 & B2 together"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "B2",
+    "instructors": "Dr. Snigdharani Panda (SR)",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-B2 / PLC LAB-B1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "B1",
+    "instructors": "Ms. Kavitha S (KS)",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-B2 / PLC LAB-B1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "C1",
+    "instructors": "Dr. G S Nanjundaswamy (GSN)",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-C1 / PLC LAB-C2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "C2",
+    "instructors": "Mr. Bharath G (BG)",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-C1 / PLC LAB-C2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "IDT Lab",
+    "lab_room": "IDT LAB",
+    "batch": "All",
+    "instructors": "Dr.TR + PYK + Dr.MM + EC1",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1 & B2 together"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "C2",
+    "instructors": "Dr. G S Nanjundaswamy (GSN)",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-C2 / PLC LAB-C1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "C1",
+    "instructors": "Mr. Bharath G (BG)",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-C2 / PLC LAB-C1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "D1",
+    "instructors": "Dr. Vinuth M (VM)",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-D1 / PLC LAB-D2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "D2",
+    "instructors": "Mr. Sumanth C M (SCM)",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-D1 / PLC LAB-D2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "D2",
+    "instructors": "Dr. Vinuth M (VM)",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-D2 / PLC LAB-D1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "D1",
+    "instructors": "Mr. Sumanth C M (SCM)",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-D2 / PLC LAB-D1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "IDT Lab",
+    "lab_room": "IDT LAB",
+    "batch": "All",
+    "instructors": "Dr.SKS + EC5 + Dr.MM + EC6",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1 & B2 together"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "E",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "E1",
+    "instructors": "Mrs. Vidyashree R (VR)",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-E1 / PLC LAB-E2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "E",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "E2",
+    "instructors": "Mr. Manoj N Sogi (MNS)",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "CHE LAB-E1 / PLC LAB-E2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "E",
+    "lab_name": "CHE Lab",
+    "lab_room": "CHE LAB",
+    "batch": "E2",
+    "instructors": "Mrs. Vidyashree R (VR)",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-E2 / PLC LAB-E1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "E",
+    "lab_name": "PLC Lab",
+    "lab_room": "PLC LAB",
+    "batch": "E1",
+    "instructors": "Mr. Manoj N Sogi (MNS)",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "CHE LAB-E2 / PLC LAB-E1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE",
+    "section": "E",
+    "lab_name": "IDT Lab",
+    "lab_room": "IDT LAB",
+    "batch": "All",
+    "instructors": "Dr.SKS + PYK + Dr.MM + EC7",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1 & B2 together"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "F1",
+    "instructors": "Dr. Chandra (CH)",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB F1 / PSCL LAB F2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "F2",
+    "instructors": "Mrs. Smitha B (SB)",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB F1 / PSCL LAB F2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "F2",
+    "instructors": "Dr. Chandra (CH)",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB F2 / PSCL LAB F1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "F1",
+    "instructors": "Mrs. Smitha B (SB)",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB F2 / PSCL LAB F1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "G",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "G1",
+    "instructors": "Dr. Vinaykumar D C (VDC)",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "PHY LAB G1 / PSCL LAB G2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "G",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "G2",
+    "instructors": "Mrs. Rashmi M (RM)",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "PHY LAB G1 / PSCL LAB G2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "G",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "G2",
+    "instructors": "Dr. Vinaykumar D C (VDC)",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB G2 / PSCL LAB G1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "G",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "G1",
+    "instructors": "Mrs. Rashmi M (RM)",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB G2 / PSCL LAB G1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "H",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "H1",
+    "instructors": "Smt. Shraddha Marathe (SM)",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB H1 / PSCL LAB H2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "H",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "H2",
+    "instructors": "Mrs. Amruthasree V M (AVM)",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB H1 / PSCL LAB H2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "H",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "H2",
+    "instructors": "Smt. Shraddha Marathe (SM)",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB H2 / PSCL LAB H1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "CSE (AI&ML)",
+    "section": "H",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "H1",
+    "instructors": "Mrs. Amruthasree V M (AVM)",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB H2 / PSCL LAB H1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "A",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "A1",
+    "instructors": "Dr. Chandra (CH)",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB A1 / PSCL LAB A2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "A",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "A2",
+    "instructors": "Ms. Harshitha H S (HHS)",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB A1 / PSCL LAB A2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "A",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "A2",
+    "instructors": "Dr. Chandra (CH)",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB A2 / PSCL LAB A1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "A",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "A1",
+    "instructors": "Ms. Harshitha H S (HHS)",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB A2 / PSCL LAB A1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "B",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "B1",
+    "instructors": "Dr. Vinaykumar D C (VDC)",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB B1 / PSCL LAB B2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "B",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "B2",
+    "instructors": "Mr. Sumanth C M (SCM)",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "PHY LAB B1 / PSCL LAB B2 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "B",
+    "lab_name": "PHY Lab",
+    "lab_room": "PHY LAB",
+    "batch": "B2",
+    "instructors": "Dr. Vinaykumar D C (VDC)",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB B2 / PSCL LAB B1 simultaneously"
+  },
+  {
+    "semester": "II",
+    "dept": "AI & ML",
+    "section": "B",
+    "lab_name": "PSCL Lab",
+    "lab_room": "PSCL LAB",
+    "batch": "B1",
+    "instructors": "Mr. Sumanth C M (SCM)",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "PHY LAB B2 / PSCL LAB B1 simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A1",
+    "instructors": "MMA+SKJ",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-ADA / A2-DBMS / A3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "A2",
+    "instructors": "Dr.MRR+DR",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-ADA / A2-DBMS / A3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "A3",
+    "instructors": "PK+MA",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-ADA / A2-DBMS / A3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "A1",
+    "instructors": "PK+SMK",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-MC / A2-ADA / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A2",
+    "instructors": "Dr.NSP+Dr.UMS",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-MC / A2-ADA / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "A3",
+    "instructors": "UKP+PRV",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-MC / A2-ADA / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "A1",
+    "instructors": "UKP+NAG",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-DBMS / A2-MC / A3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "A2",
+    "instructors": "PK+SMK",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-DBMS / A2-MC / A3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A3",
+    "instructors": "Dr.NSP+Dr.SL",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A1-DBMS / A2-MC / A3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "A1",
+    "instructors": "GRN",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "12:30",
+    "notes": "A1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "A2",
+    "instructors": "GRN",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B1",
+    "instructors": "AVM+Dr.UMS",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1-ADA / B2-DBMS / B3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "IS LAB 2,5 / AIML LAB 2",
+    "batch": "B2",
+    "instructors": "MAM+SNS",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1-ADA / B2-DBMS / B3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "B3",
+    "instructors": "VM+KS",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1-ADA / B2-DBMS / B3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "B1",
+    "instructors": "VM+SKJ+Dr.BRV",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-MC / B2-ADA / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B2",
+    "instructors": "AVM+ZF",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-MC / B2-ADA / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "IS LAB 2,5 / AIML LAB 2",
+    "batch": "B3",
+    "instructors": "NAG+DMS",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-MC / B2-ADA / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "B1",
+    "instructors": "SSM",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "IS LAB 2,5 / AIML LAB 2",
+    "batch": "B1",
+    "instructors": "Dr.NM+KM",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1-DBMS / B2-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "B2",
+    "instructors": "VM+SMK",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1-DBMS / B2-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B3",
+    "instructors": "AVM+ZF",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B3 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "B2",
+    "instructors": "SSM",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C1",
+    "instructors": "SNS+ZF",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1-ADA / C2-DBMS / C3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "C2",
+    "instructors": "SKM+PRV",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1-ADA / C2-DBMS / C3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "C3",
+    "instructors": "SMK+NAG",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1-ADA / C2-DBMS / C3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "C1",
+    "instructors": "SMK+NAG",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C1-MC / C2-ADA / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C2",
+    "instructors": "Dr.NSP+DMS",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C1-MC / C2-ADA / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "C3",
+    "instructors": "SKM+KM",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C1-MC / C2-ADA / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "C1",
+    "instructors": "GRN",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "C1",
+    "instructors": "SKM+Dr.UMS",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-DBMS / C2-MC / C3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "C2",
+    "instructors": "SMK+NAG",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-DBMS / C2-MC / C3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C3",
+    "instructors": "MMA+BS",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-DBMS / C2-MC / C3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2 / IS LAB 6",
+    "batch": "C2",
+    "instructors": "GRN",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "D1",
+    "instructors": "ZF+BS",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-DBMS / D3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "D2",
+    "instructors": "SKM+KM",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-DBMS / D3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "D3",
+    "instructors": "PK+NAG",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-DBMS / D3-MC simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "D1",
+    "instructors": "SSM",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "D1",
+    "instructors": "PK+JPA",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1-MC / D2-ADA / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "D2",
+    "instructors": "ZF+SKJ",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1-MC / D2-ADA / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "D3",
+    "instructors": "UKP+LKB",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1-MC / D2-ADA / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "UI/UX Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "D2",
+    "instructors": "SSM",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "D1",
+    "instructors": "SKM+HHS",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D1-DBMS / D2-MC / D3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "MC Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "D2",
+    "instructors": "PK+NAG",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D1-DBMS / D2-MC / D3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "D3",
+    "instructors": "NMR+BS",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D1-DBMS / D2-MC / D3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 4",
+    "batch": "E1",
+    "instructors": "Dr.NSP+BS",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E1-ADA / E2-DBMS / E3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "E2",
+    "instructors": "UKP+SSM",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E1-ADA / E2-DBMS / E3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E3",
+    "instructors": "BV+DMS",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E1-ADA / E2-DBMS / E3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 4",
+    "batch": "E2",
+    "instructors": "PRV+KS",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "E2-ADA / E3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "E3",
+    "instructors": "UKP+NAG",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "E2-ADA / E3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E1",
+    "instructors": "BV+MA",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "E1",
+    "instructors": "UKP+SNS+Dr.CVR",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "E1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "MERN Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "E2",
+    "instructors": "DR+ZF",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 4",
+    "batch": "E3",
+    "instructors": "Dr.SS+ZF+SKJ",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "E3-ADA / E2-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E2",
+    "instructors": "DMS+NV",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "E3-ADA / E2-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "MERN Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "E1",
+    "instructors": "DR+ZF",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "E1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 6",
+    "batch": "F1",
+    "instructors": "MMA+HC",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "F1-ADA / F2-DBMS / F3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "F2",
+    "instructors": "PRV+HHS",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "F1-ADA / F2-DBMS / F3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F3",
+    "instructors": "NV+SKJ",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "F1-ADA / F2-DBMS / F3-AI simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "MERN Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "F1",
+    "instructors": "ZF+DR",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "F1 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "F1",
+    "instructors": "PRV+MA",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-DBMS / F2-AI / F3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F2",
+    "instructors": "BV+KM",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-DBMS / F2-AI / F3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 6",
+    "batch": "F3",
+    "instructors": "Dr.BSJ+SKV+SKJ",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-DBMS / F2-AI / F3-ADA simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "AI Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F1",
+    "instructors": "BV+DMS",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-AI / F2-ADA / F3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4 / IS LAB 6",
+    "batch": "F2",
+    "instructors": "MMA+HHS",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-AI / F2-ADA / F3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DBMS Lab",
+    "lab_room": "CS LAB 8",
+    "batch": "F3",
+    "instructors": "PRV+NMR",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1-AI / F2-ADA / F3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "MERN Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "F2",
+    "instructors": "ZF+DR",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "F2 only"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A1",
+    "instructors": "Dr.MDT+PMT",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "A1-ADA / A2-AJ / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "A2",
+    "instructors": "Dr.HPG+LH",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "A1-ADA / A2-AJ / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "A3",
+    "instructors": "SBN+VR",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "A1-ADA / A2-AJ / A3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A2",
+    "instructors": "Dr.BMN+Dr.MDT",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A2-ADA / A3-AJ / A1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "A3",
+    "instructors": "Dr.HPG+SPY",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A2-ADA / A3-AJ / A1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "A1",
+    "instructors": "SS+PM",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A2-ADA / A3-AJ / A1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "A3",
+    "instructors": "Dr.BMN+PHS",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A3-ADA / A1-AJ / A2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "A1",
+    "instructors": "Dr.HPG+SBR",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A3-ADA / A1-AJ / A2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "A2",
+    "instructors": "SS+PM",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A3-ADA / A1-AJ / A2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B1",
+    "instructors": "PM+VR",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-ADA / B2-AJ / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "B2",
+    "instructors": "Dr.MDT+SBN",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-ADA / B2-AJ / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "B3",
+    "instructors": "SBR+PHS",
+    "day": "Monday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1-ADA / B2-AJ / B3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B2",
+    "instructors": "Dr.MDT+SBN",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B2-ADA / B3-AJ / B1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "B3",
+    "instructors": "Dr.SD+MU",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B2-ADA / B3-AJ / B1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "B1",
+    "instructors": "SBR+PBS",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B2-ADA / B3-AJ / B1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "B3",
+    "instructors": "Dr.RD+PHS",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B3-ADA / B1-AJ / B2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "B1",
+    "instructors": "BNK+PM",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B3-ADA / B1-AJ / B2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "B2",
+    "instructors": "MU+PMT",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B3-ADA / B1-AJ / B2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C1",
+    "instructors": "Dr.MDT+BR",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-ADA / C2-AJ / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "C2",
+    "instructors": "SS+VR",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-ADA / C2-AJ / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "C3",
+    "instructors": "BNK+PM",
+    "day": "Wednesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1-ADA / C2-AJ / C3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C2",
+    "instructors": "Dr.MDT+SBN",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C2-ADA / C3-AJ / C1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "C3",
+    "instructors": "PM+VR",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C2-ADA / C3-AJ / C1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "C1",
+    "instructors": "BNK+SBR",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C2-ADA / C3-AJ / C1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "ADA Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "C3",
+    "instructors": "Dr.MDT+PMT",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C3-ADA / C1-AJ / C2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "C1",
+    "instructors": "LH+SS",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C3-ADA / C1-AJ / C2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "C2",
+    "instructors": "VR+SBN",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C3-ADA / C1-AJ / C2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "ADA LAB",
+    "batch": "D3",
+    "instructors": "Dr.RD+SBN",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D3-ADA / D1-AJ / D2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "D1",
+    "instructors": "SS+BR",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D3-ADA / D1-AJ / D2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "D2",
+    "instructors": "NP+SPY",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D3-ADA / D1-AJ / D2-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "ADA LAB",
+    "batch": "D1",
+    "instructors": "Dr.RD+SBN",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-AJ / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "D2",
+    "instructors": "BR+VR",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-AJ / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "D3",
+    "instructors": "SBR+SPY",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "D1-ADA / D2-AJ / D3-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "ADA Lab",
+    "lab_room": "ADA LAB",
+    "batch": "D2",
+    "instructors": "VR+NP",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D2-ADA / D3-AJ / D1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "AJ Lab",
+    "lab_room": "AJ LAB",
+    "batch": "D3",
+    "instructors": "SS+PM",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D2-ADA / D3-AJ / D1-DBMS simultaneously"
+  },
+  {
+    "semester": "IV",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "DBMS Lab",
+    "lab_room": "DBMS LAB",
+    "batch": "D1",
+    "instructors": "SBR+PBS",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D2-ADA / D3-AJ / D1-DBMS simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "A1",
+    "instructors": "HC+BG",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A1-IOT & A1-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "A1",
+    "instructors": "Dr.VKA+SSS+SKJ",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A1-IOT & A1-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "A2",
+    "instructors": "HC+MA",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A2-IOT & A2-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "A2",
+    "instructors": "PN+CM",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A2-IOT & A2-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "A3",
+    "instructors": "HC+NMR",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A3-IOT & A3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "A3",
+    "instructors": "PRV+SMK",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "A3-IOT & A3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "A1",
+    "instructors": "DMS",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A1 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "A",
+    "lab_name": "Devops Lab",
+    "lab_room": "CS LAB 3",
+    "batch": "A2",
+    "instructors": "DMS",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "A2 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "B1",
+    "instructors": "HC+ZF",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1/B2/B3-IOT simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "B2",
+    "instructors": "GBJ+MNS",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1/B2/B3-IOT simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "B3",
+    "instructors": "GBJ+NR",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "B1/B2/B3-IOT simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "Devops Lab",
+    "lab_room": "IS LAB 3",
+    "batch": "B1",
+    "instructors": "JPA",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1-Devops / B2-Devops simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "B2",
+    "instructors": "JPA",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "B1-Devops / B2-Devops simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ML Lab",
+    "lab_room": "IS LAB 7",
+    "batch": "B1",
+    "instructors": "CM+MNS",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1/B2/B3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 3",
+    "batch": "B2",
+    "instructors": "CM+PN",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1/B2/B3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "B3",
+    "instructors": "CM+LKB",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B1/B2/B3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "B",
+    "lab_name": "Devops Lab",
+    "lab_room": "IS LAB 1",
+    "batch": "B3",
+    "instructors": "JPA",
+    "day": "Thursday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "B3 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 2",
+    "batch": "C1",
+    "instructors": "CM+LKB",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1/C2/C3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ML Lab",
+    "lab_room": "IS LAB 1",
+    "batch": "C2",
+    "instructors": "DR+SKV",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1/C2/C3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 3",
+    "batch": "C3",
+    "instructors": "PN+DR",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1/C2/C3-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "C1",
+    "instructors": "MA",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C1 Devops simultaneously with ML"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "C1",
+    "instructors": "NR+SMK",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1/C2-IOT simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "C2",
+    "instructors": "GBJ+SSM",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "C1/C2-IOT simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "C3",
+    "instructors": "HC+NR",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "C3 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "C",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "C2",
+    "instructors": "MA",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "C2 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "D1",
+    "instructors": "NR+HC",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1-IOT & D1-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "D1",
+    "instructors": "DR+LKB",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D1-IOT & D1-ML simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "Devops Lab",
+    "lab_room": "CS LAB 1",
+    "batch": "D2",
+    "instructors": "MA",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "D2 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "D2",
+    "instructors": "NR+SSS",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D2/D3 labs simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "D2",
+    "instructors": "PRV+SKJ",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D2/D3 labs simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "ML Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "D3",
+    "instructors": "CM+KM",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D2/D3 labs simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "D1",
+    "instructors": "JPA",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D1 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "IOT Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "D3",
+    "instructors": "NR+NV",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D3-IOT & D3-Devops simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE",
+    "section": "D",
+    "lab_name": "Devops Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "D3",
+    "instructors": "JPA",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "D3-IOT & D3-Devops simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E1",
+    "instructors": "JPA+SKJ",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "E1-MC&ES / E2-DL / E1-PyTorch simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DL Lab",
+    "lab_room": "IS LAB 4 (AIML LAB 3)",
+    "batch": "E2",
+    "instructors": "SB+MAM",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "E2-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "PyTorch Lab",
+    "lab_room": "CS LAB 3 (AIML LAB 3)",
+    "batch": "E1",
+    "instructors": "SNS",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "E1-PyTorch simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "PyTorch Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "E3",
+    "instructors": "SNS",
+    "day": "Tuesday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "E3 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E2",
+    "instructors": "JPA+CM",
+    "day": "Tuesday",
+    "start": "11:00",
+    "end": "12:30",
+    "notes": "E2-MC&ES / E1-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DL Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "E1",
+    "instructors": "SB+SKV",
+    "day": "Tuesday",
+    "start": "11:00",
+    "end": "12:30",
+    "notes": "E1-DL / E2-MC&ES simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "PyTorch Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "E2",
+    "instructors": "SNS",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "E2 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "E3",
+    "instructors": "JPA+SMK",
+    "day": "Friday",
+    "start": "11:00",
+    "end": "12:30",
+    "notes": "E3-MC&ES / E3-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "E",
+    "lab_name": "DL Lab",
+    "lab_room": "IS LAB 1",
+    "batch": "E3",
+    "instructors": "SB+LKB",
+    "day": "Friday",
+    "start": "11:00",
+    "end": "12:30",
+    "notes": "E3-DL / E3-MC&ES simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F1",
+    "instructors": "VM+SNS",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1/F3-MC&ES simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F3",
+    "instructors": "VM+HC",
+    "day": "Monday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F1/F3-MC&ES simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PyTorch Lab",
+    "lab_room": "AIML LAB 4",
+    "batch": "F2",
+    "instructors": "SNS",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F2 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "MC&ES Lab",
+    "lab_room": "AIML LAB 1",
+    "batch": "F2",
+    "instructors": "VM+MA",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F2-MC&ES / F3-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DL Lab",
+    "lab_room": "IS LAB 5 (AIML LAB 3)",
+    "batch": "F3",
+    "instructors": "KM (tentative)",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "F3 DL - check schedule"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "PyTorch Lab",
+    "lab_room": "AIML LAB 3",
+    "batch": "F1",
+    "instructors": "SNS",
+    "day": "Friday",
+    "start": "09:00",
+    "end": "11:00",
+    "notes": "F1 only"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DL Lab",
+    "lab_room": "IS LAB 5",
+    "batch": "F1",
+    "instructors": "KM+SKJ",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "F1/F2/F3-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DL Lab",
+    "lab_room": "IS LAB 1",
+    "batch": "F2",
+    "instructors": "LKB+MAM",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "F1/F2/F3-DL simultaneously"
+  },
+  {
+    "semester": "VI",
+    "dept": "CSE (AI&ML)",
+    "section": "F",
+    "lab_name": "DL Lab",
+    "lab_room": "AIML LAB 2",
+    "batch": "F3",
+    "instructors": "SMK+KM",
+    "day": "Friday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "F1/F2/F3-DL simultaneously"
+  }
+];
+const DAYS_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
+function fmtTime(t) {
+  if (!t || t === '00:00') return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+// Split "A1 (MMA+SKJ)" into { batch: "A1", faculty: "MMA + SKJ" }
+function parseBatch(raw) {
+  const match = raw.match(/^([^\(]+)\s*\(([^\)]+)\)\s*$/);
+  if (match) {
+    const batchNum = match[1].trim();
+    const faculty  = match[2].trim().replace(/\+/g, ' + ');
+    return { batchNum, faculty };
+  }
+  return { batchNum: raw.trim(), faculty: '' };
+}
+
+function getLabStyle(name) {
+  const n = name.toUpperCase();
+  if (n.includes('CHE'))     return { bg:'bg-orange-500', light:'bg-orange-50 dark:bg-orange-900/20', text:'text-orange-600 dark:text-orange-300', icon:'science' };
+  if (n.includes('PHY'))     return { bg:'bg-blue-500',   light:'bg-blue-50 dark:bg-blue-900/20',     text:'text-blue-600 dark:text-blue-300',     icon:'bolt' };
+  if (n.includes('IDT'))     return { bg:'bg-green-500',  light:'bg-green-50 dark:bg-green-900/20',   text:'text-green-600 dark:text-green-300',   icon:'engineering' };
+  if (n.includes('PLC'))     return { bg:'bg-yellow-500', light:'bg-yellow-50 dark:bg-yellow-900/20', text:'text-yellow-600 dark:text-yellow-300', icon:'memory' };
+  if (n.includes('PSC'))     return { bg:'bg-teal-500',   light:'bg-teal-50 dark:bg-teal-900/20',     text:'text-teal-600 dark:text-teal-300',     icon:'biotech' };
+  if (n.includes('UI') || n.includes('UX')) return { bg:'bg-pink-500', light:'bg-pink-50 dark:bg-pink-900/20', text:'text-pink-600 dark:text-pink-300', icon:'design_services' };
+  if (n.includes('IOT'))     return { bg:'bg-cyan-500',   light:'bg-cyan-50 dark:bg-cyan-900/20',     text:'text-cyan-600 dark:text-cyan-300',     icon:'device_hub' };
+  if (n.includes('PYTORCH')) return { bg:'bg-purple-500', light:'bg-purple-50 dark:bg-purple-900/20', text:'text-purple-600 dark:text-purple-300', icon:'psychology' };
+  if (n.includes('DEEP') || n.includes('DL')) return { bg:'bg-purple-600', light:'bg-purple-50 dark:bg-purple-900/20', text:'text-purple-600 dark:text-purple-300', icon:'psychology' };
+  if (n.includes('ML'))      return { bg:'bg-violet-500', light:'bg-violet-50 dark:bg-violet-900/20', text:'text-violet-600 dark:text-violet-300', icon:'model_training' };
+  if (n.includes('MERN'))    return { bg:'bg-indigo-500', light:'bg-indigo-50 dark:bg-indigo-900/20', text:'text-indigo-600 dark:text-indigo-300', icon:'code' };
+  if (n.includes('FSD') || n.includes('FULL')) return { bg:'bg-indigo-500', light:'bg-indigo-50 dark:bg-indigo-900/20', text:'text-indigo-600 dark:text-indigo-300', icon:'code' };
+  if (n.includes('DEVOPS'))  return { bg:'bg-slate-600',  light:'bg-slate-100 dark:bg-slate-800',     text:'text-slate-600 dark:text-slate-300',   icon:'cloud' };
+  if (n.includes('ADA') || n.includes('DBMS') || n.includes('AJ')) return { bg:'bg-teal-500', light:'bg-teal-50 dark:bg-teal-900/20', text:'text-teal-600 dark:text-teal-300', icon:'storage' };
+  if (n.includes('AI'))      return { bg:'bg-fuchsia-500',light:'bg-fuchsia-50 dark:bg-fuchsia-900/20',text:'text-fuchsia-600 dark:text-fuchsia-300',icon:'smart_toy' };
+  if (n.includes('MC&ES') || n.includes('MC ')) return { bg:'bg-rose-500', light:'bg-rose-50 dark:bg-rose-900/20', text:'text-rose-600 dark:text-rose-300', icon:'memory' };
+  return { bg:'bg-slate-500', light:'bg-slate-100 dark:bg-slate-800', text:'text-slate-600 dark:text-slate-300', icon:'science' };
+}
+
+function getIST() {
+  const now = new Date();
+  const utcMs = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const ist = new Date(utcMs + 5.5 * 60 * 60 * 1000);
+  return {
+    time: `${String(ist.getHours()).padStart(2,'0')}:${String(ist.getMinutes()).padStart(2,'0')}`,
+    day: ist.toLocaleDateString('en-US', { weekday: 'long' })
+  };
+}
+
+let activeDay = 'all', activeSem = 'all', activeDept = 'all', searchQ = '';
+
+function deptMatch(dept) {
+  if (activeDept === 'all') return true;
+  if (activeDept === 'CSE')  return dept === 'CSE';
+  if (activeDept === 'ISE')  return dept === 'ISE';
+  if (activeDept === 'AIML') return dept === 'CSE (AI&ML)';
+  return true;
+}
+
+function semLabel(s) {
+  return s === 'II' ? '2nd Sem' : s === 'IV' ? '4th Sem' : s === 'VI' ? '6th Sem' : s;
+}
+
+function renderLabs() {
+  const { time: now, day: today } = getIST();
+  const grid = document.getElementById('lab-grid');
+  const empty = document.getElementById('empty-state');
+  const countEl = document.getElementById('lab-count');
+
+  let filtered = [...LAB_DATA];
+  if (activeDay !== 'all') filtered = filtered.filter(l => l.day === activeDay);
+  if (activeSem !== 'all') filtered = filtered.filter(l => l.semester === activeSem);
+  filtered = filtered.filter(l => deptMatch(l.dept));
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    filtered = filtered.filter(l =>
+      l.lab_name.toLowerCase().includes(q) ||
+      l.section.toLowerCase().includes(q) ||
+      l.dept.toLowerCase().includes(q) ||
+      l.batch.toLowerCase().includes(q) ||
+      l.lab_room.toLowerCase().includes(q)
+    );
+  }
+
+  countEl.textContent = `(${filtered.length} sessions)`;
+
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const byDay = {};
+  DAYS_ORDER.forEach(d => byDay[d] = []);
+  filtered.forEach(l => { if (byDay[l.day]) byDay[l.day].push(l); });
+
+  const daysToShow = activeDay === 'all' ? DAYS_ORDER : [activeDay];
+  let html = '';
+
+  for (const day of daysToShow) {
+    const entries = (byDay[day] || []).sort((a,b) => a.start.localeCompare(b.start));
+    if (!entries.length) continue;
+    const isToday = day === today;
+
+    html += `<div class="col-span-full mt-4 mb-2 flex items-center gap-2">
+      <span class="text-base font-bold ${isToday ? 'text-primary' : 'text-slate-600 dark:text-slate-300'}">${day}</span>
+      ${isToday ? '<span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">Today</span>' : ''}
+      <span class="text-xs text-slate-400">${entries.length} sessions</span>
+    </div>`;
+
+    // Group entries by time slot so batches at same time are shown together
+    const bySlot = {};
+    for (const lab of entries) {
+      const slotKey = lab.start + '-' + lab.section;
+      if (!bySlot[slotKey]) bySlot[slotKey] = [];
+      bySlot[slotKey].push(lab);
+    }
+
+    // Sort slots by start time
+    const sortedSlots = Object.keys(bySlot).sort((a,b) => a.localeCompare(b));
+
+    for (const slotKey of sortedSlots) {
+      const slotEntries = bySlot[slotKey];
+      const firstLab = slotEntries[0];
+      const isNow = isToday && now >= firstLab.start && now < firstLab.end;
+
+      // If multiple different labs at same time — show as one grouped card
+      if (slotEntries.length > 1) {
+        html += `
+          <div class="col-span-full bg-white dark:bg-slate-900 rounded-2xl border ${isNow ? 'border-primary now-glow' : 'border-slate-200 dark:border-slate-800'} overflow-hidden transition-all">
+            <div class="h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+            <div class="p-5">
+              ${isNow ? `<div class="flex items-center gap-1.5 mb-3">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse inline-block"></span>
+                <span class="text-xs font-bold text-primary uppercase tracking-wide">Happening Now</span>
+              </div>` : ''}
+              <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-slate-400 text-sm">schedule</span>
+                <span class="text-sm font-bold text-slate-700 dark:text-slate-200">${fmtTime(firstLab.start)} – ${fmtTime(firstLab.end)}</span>
+                <span class="text-xs text-slate-400">· ${semLabel(firstLab.semester)} ${firstLab.dept} Sec-${firstLab.section}</span>
+                <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-semibold ml-auto">Batches split across labs</span>
+              </div>
+              <div class="space-y-2">
+                ${slotEntries.map(lab => {
+                  const s = getLabStyle(lab.lab_name);
+                  return `<div class="flex items-center gap-3 p-3 rounded-xl ${s.light}">
+                    <div class="size-9 rounded-lg bg-white/60 dark:bg-slate-900/40 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined ${s.text} text-lg">${s.icon}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-bold text-sm text-slate-900 dark:text-white">${lab.lab_name}</p>
+                      <p class="text-xs ${s.text} font-semibold">Batch: ${parseBatch(lab.batch).batchNum}</p>
+                      ${lab.instructors ? `<p class="text-xs text-slate-500 dark:text-slate-400">👨‍🏫 ${lab.instructors}</p>` : ''}
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                      <span class="text-xs font-bold text-primary">${lab.lab_room || 'TBD'}</span>
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>`;
+      } else {
+        // Single entry — show as individual card
+        const lab = slotEntries[0];
+        const style = getLabStyle(lab.lab_name);
+        html += `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border ${isNow ? 'border-primary now-glow' : 'border-slate-200 dark:border-slate-800'} overflow-hidden transition-all">
+            <div class="h-1.5 ${style.bg}"></div>
+            <div class="p-5">
+              ${isNow ? `<div class="flex items-center gap-1.5 mb-3">
+                <span class="w-2 h-2 rounded-full ${style.bg} animate-pulse inline-block"></span>
+                <span class="text-xs font-bold text-primary uppercase tracking-wide">Happening Now</span>
+              </div>` : ''}
+              <div class="flex items-center gap-3 mb-4">
+                <div class="size-11 rounded-xl ${style.light} flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined ${style.text} text-xl">${style.icon}</span>
+                </div>
+                <div>
+                  <p class="font-bold text-lg leading-tight text-slate-900 dark:text-white">${lab.lab_name}</p>
+                  <p class="text-xs text-slate-400 mt-0.5">${semLabel(lab.semester)} · ${lab.dept}</p>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400 text-sm">groups</span>
+                    <span class="text-sm font-bold">${lab.dept} - Sec ${lab.section}</span>
+                  </div>
+  <div class="text-right">
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-lg ${style.light} ${style.text} block">Batch ${parseBatch(lab.batch).batchNum}</span>
+                    ${lab.instructors ? `<span class="text-xs text-slate-400 mt-0.5 block">👨‍🏫 ${lab.instructors}</span>` : ''}
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 px-1">
+                  <span class="material-symbols-outlined text-slate-400 text-sm">schedule</span>
+                  <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">${fmtTime(lab.start)} – ${fmtTime(lab.end)}</span>
+                </div>
+                <div class="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20">
+                  <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                  <span class="text-sm font-bold text-primary">${lab.lab_room || 'Location TBD'}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+document.querySelectorAll('.day-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    activeDay = tab.dataset.day;
+    document.querySelectorAll('.day-tab').forEach(t => {
+      t.className = 'day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+    });
+    tab.className = 'day-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-white';
+    renderLabs();
+  });
+});
+
+document.getElementById('filter-sem').addEventListener('change', e => { activeSem = e.target.value; renderLabs(); });
+document.getElementById('filter-dept').addEventListener('change', e => { activeDept = e.target.value; renderLabs(); });
+document.getElementById('lab-search').addEventListener('input', e => { searchQ = e.target.value.trim(); renderLabs(); });
+
+renderLabs();
+setInterval(renderLabs, 60000);
+</script>
+</body>
+</html>
