@@ -43,6 +43,10 @@
         <h1 class="text-xl font-bold tracking-tight">NIE ClassPulse</h1>
       </div>
       <div class="hidden md:flex items-center gap-3">
+        <button onclick="showSection('home')" id="nav-home"
+           class="nav-link active flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold border border-primary bg-primary/10 text-primary transition-colors">
+          <span class="material-symbols-outlined text-base">home</span>Home
+        </button>
         <a href="/pages/labs.html"
            class="flex items-center gap-1.5 text-white px-3 py-2 rounded-lg text-sm font-bold border border-purple-400 transition-all"
            style="background: linear-gradient(135deg, #7c3aed, #a855f7); box-shadow: 0 0 12px rgba(168,85,247,0.6);">
@@ -52,6 +56,14 @@
            class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">
           <span class="material-symbols-outlined text-base">event_available</span>Reserved Classes
         </a>
+        <button onclick="showSection('founders')" id="nav-founders"
+           class="nav-link flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">
+          <span class="material-symbols-outlined text-base">groups</span>Founders
+        </button>
+        <button onclick="showSection('about')" id="nav-about"
+           class="nav-link flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">
+          <span class="material-symbols-outlined text-base">info</span>About
+        </button>
         <a id="prebook-btn" href="/pages/prebook.html" style="display:none"
            class="flex items-center gap-1.5 bg-primary text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
           <span class="material-symbols-outlined text-base">add_circle</span>Pre-Book a Class
@@ -83,6 +95,9 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+
+<!-- ===== HOME SECTION ===== -->
+<section id="section-home">
 
   <!-- Live banner -->
   <div class="flex flex-wrap items-center gap-3 mb-6">
@@ -185,6 +200,80 @@
   <div id="room-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     <div class="col-span-full flex justify-center py-12"><div class="loader"></div></div>
   </div>
+</section>
+
+<!-- ===== FOUNDERS SECTION ===== -->
+<section id="section-founders" style="display:none">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="material-symbols-outlined text-primary text-3xl">groups</span>
+    <h2 class="text-2xl font-bold">Meet the Founders</h2>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <!-- Tilak MK -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
+      <div class="size-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold mb-4">T</div>
+      <h3 class="text-lg font-bold">Tilak MK</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Full-Stack Developer</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">AIML · NIE Mysuru</p>
+    </div>
+    <!-- Vinayaka J -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
+      <div class="size-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 text-3xl font-bold mb-4">V</div>
+      <h3 class="text-lg font-bold">Vinayaka J</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Backend Engineer</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">AIML · NIE Mysuru</p>
+    </div>
+    <!-- Uday Kiran PS -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
+      <div class="size-20 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 text-3xl font-bold mb-4">U</div>
+      <h3 class="text-lg font-bold">Uday Kiran PS</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Database Architect</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">AIML · NIE Mysuru</p>
+    </div>
+    <!-- Vikas HB -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
+      <div class="size-20 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 text-3xl font-bold mb-4">V</div>
+      <h3 class="text-lg font-bold">Vikas HB</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Frontend Developer</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">AIML · NIE Mysuru</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT SECTION ===== -->
+<section id="section-about" style="display:none">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="material-symbols-outlined text-primary text-3xl">info</span>
+    <h2 class="text-2xl font-bold">About NIE ClassPulse</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <!-- Vision -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined">visibility</span>
+        </div>
+        <h3 class="text-lg font-bold">Our Vision</h3>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        To create a seamless, real-time classroom management system that empowers students and faculty at NIE to make informed decisions about space utilization, reducing wasted time and improving academic productivity.
+      </p>
+    </div>
+    <!-- Mission -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="size-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600">
+          <span class="material-symbols-outlined">rocket_launch</span>
+        </div>
+        <h3 class="text-lg font-bold">Our Mission</h3>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        To build and maintain an intuitive, live dashboard that tracks classroom availability across NIE campus — helping students find free rooms instantly, enabling faculty to book spaces effortlessly, and providing administration with actionable insights on room usage patterns.
+      </p>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- Footer -->
@@ -295,6 +384,26 @@ function toggleTheme() {
     if (el) el.textContent = icon;
   });
 }
+
+function showSection(name) {
+  ['home','founders','about'].forEach(s => {
+    const sec = document.getElementById('section-' + s);
+    if (sec) sec.style.display = (s === name) ? '' : 'none';
+  });
+  // Update active nav button style
+  document.querySelectorAll('.nav-link').forEach(btn => {
+    const isActive = btn.id === 'nav-' + name;
+    btn.classList.toggle('active', isActive);
+    if (isActive) {
+      btn.classList.add('border-primary','bg-primary/10','text-primary');
+      btn.classList.remove('text-slate-600','dark:text-slate-300','border-slate-200','dark:border-slate-700');
+    } else {
+      btn.classList.remove('border-primary','bg-primary/10','text-primary');
+      btn.classList.add('text-slate-600','dark:text-slate-300','border-slate-200','dark:border-slate-700');
+    }
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const isDark = document.documentElement.classList.contains('dark');
   const icon = isDark ? 'light_mode' : 'dark_mode';
