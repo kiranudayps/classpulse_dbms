@@ -9,6 +9,7 @@ app.use(express.json());
 // MySQL connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'nie_classpulse',
@@ -17,12 +18,24 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// GET /api/health - Check DB connection
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    console.error('[HEALTH CHECK FAILED]', err);
+    res.status(500).json({ status: 'error', db: err.message });
+  }
+});
+
 // GET /api/rooms - Get all rooms
 app.get('/api/rooms', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM classrooms ORDER BY room_number');
     res.json(rows);
   } catch (err) {
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -34,6 +47,7 @@ app.get('/api/room/:id', async (req, res) => {
     if (rows.length === 0) return res.status(404).json({ error: 'Room not found' });
     res.json(rows[0]);
   } catch (err) {
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -45,6 +59,7 @@ app.get('/api/room/:id/schedule', async (req, res) => {
     // Stored procedures return arrays of results, so we get rows[0]
     res.json(rows[0]);
   } catch (err) {
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -58,6 +73,7 @@ app.get('/api/stats', async (req, res) => {
     const occupied = rows.filter(r => r.status === 'occupied').length;
     res.json({ total, vacant, occupied });
   } catch (err) {
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -99,7 +115,7 @@ app.patch('/api/room/:id/status', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -123,6 +139,7 @@ app.post('/api/login', async (req, res) => {
       res.status(401).json({ error: 'Invalid login credentials' });
     }
   } catch (err) {
+    console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
   }
 });

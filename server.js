@@ -8,7 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 // Serve the frontend static HTML files
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
+app.use('/pages', express.static(path.join(__dirname, 'pages')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
 
 // Serve index.html on root
 app.get('/', (req, res) => {
@@ -18,6 +20,7 @@ app.get('/', (req, res) => {
 // MySQL connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'nie_classpulse',
@@ -136,7 +139,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`ClassPulse MySQL API running on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`ClassPulse running on port ${PORT}`));
 
 module.exports = app;
