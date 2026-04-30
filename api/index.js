@@ -1,19 +1,10 @@
 const express = require('express');
-const path = require('path');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Serve the frontend static HTML files
-app.use(express.static(__dirname));
-
-// Serve index.html on root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 // MySQL connection pool
 const pool = mysql.createPool({
@@ -135,8 +126,5 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-const PORT = 3000;
-app.listen(PORT, () => console.log(`ClassPulse MySQL API running on port ${PORT}`));
 
 module.exports = app;

@@ -2,7 +2,7 @@
 //  js/api.js — Local API client replacing Supabase
 // ============================================================
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 export async function fetchFromApi(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
