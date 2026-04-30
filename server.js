@@ -74,6 +74,17 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// GET /api/health - Check DB connection
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    console.error('[HEALTH CHECK FAILED]', err);
+    res.status(500).json({ status: 'error', db: err.message });
+  }
+});
+
 // PATCH /api/room/:id/status - Update room status
 app.patch('/api/room/:id/status', async (req, res) => {
   const { status, sessionInfo, userId, userName } = req.body;
