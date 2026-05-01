@@ -163,11 +163,18 @@ app.post('/api/login', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-// Room status sync scheduler (Runs every 1 minute)
-// Uses IST (UTC+5:30) to check current day and time against schedules
-setInterval(async () => {
+// Room status sync function
+async function syncRoomStatus() {
   try {
-    // Mark rooms as occupied if there is an ongoing class
+    const useUTC = process.env.DB_UTC === 'true';
+    const dayExpr = useUTC 
+      ? "DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))"
+      : "DAYNAME(NOW())";
+    const timeExpr = useUTC
+      ? "TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))"
+      : "TIME(NOW())";
+
+    // Mark rooms as occupied if there is an ongoing class (excluding standalone LAB sessions)
     await pool.query(`
       UPDATE classrooms c
       JOIN schedules s ON c.id = s.room_id
@@ -177,12 +184,7 @@ setInterval(async () => {
           c.session_end = s.end_time
       WHERE s.day = ${dayExpr}
       AND ${timeExpr} BETWEEN s.start_time AND s.end_time
-      AND s.subject NOT LIKE '%LAB%'
-      AND s.subject NOT LIKE '%Lab%'
-      AND s.subject NOT LIKE '%lab%'
-      AND s.subject NOT LIKE '%Practical%'
-      AND s.subject NOT LIKE '%Workshop%'
-      AND s.subject NOT LIKE '%Tutorial%'
+      AND s.subject NOT REGEXP '\\\\bLAB\\\\b'
     `);
 
     // Mark rooms as vacant if there is no ongoing class
@@ -196,21 +198,23 @@ setInterval(async () => {
         SELECT room_id FROM schedules
         WHERE day = ${dayExpr}
         AND ${timeExpr} BETWEEN start_time AND end_time
-        AND subject NOT LIKE '%LAB%'
-        AND subject NOT LIKE '%Lab%'
-        AND subject NOT LIKE '%lab%'
-        AND subject NOT LIKE '%Practical%'
-        AND subject NOT LIKE '%Workshop%'
-        AND subject NOT LIKE '%Tutorial%'
+        AND subject NOT REGEXP '\\\\bLAB\\\\b'
       )
     `);
+    console.log(`[SYNC] Room status updated at ${new Date().toLocaleTimeString()}`);
   } catch (err) {
     console.error('[SYNC ERROR] Failed to sync room status:', err);
   }
-}, 60000);
+}
+
+// Room status sync scheduler (Runs every 1 minute)
+setInterval(syncRoomStatus, 60000);
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`ClassPulse running on port ${PORT}`);
 });
+
+// Run sync immediately on startup
+setTimeout(() => syncRoomStatus(), 3000);
 
 module.exports = app;

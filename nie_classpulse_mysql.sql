@@ -1,4 +1,4 @@
-﻿DROP DATABASE IF EXISTS nie_classpulse;
+DROP DATABASE IF EXISTS nie_classpulse;
 CREATE DATABASE nie_classpulse;
 USE nie_classpulse;
 
@@ -958,9 +958,7 @@ BEGIN
         c.session_end = s.end_time
     WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
     AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
-    AND s.subject NOT LIKE '%LAB%'
-    AND s.subject NOT LIKE '%Lab%'
-    AND s.subject NOT LIKE '%lab%'
+    AND s.subject NOT REGEXP '\\bLAB\\b';
   
 
     UPDATE classrooms
@@ -972,9 +970,7 @@ BEGIN
         SELECT room_id FROM schedules
         WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
         AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
-        AND subject NOT LIKE '%LAB%'
-        AND subject NOT LIKE '%Lab%'
-        AND subject NOT LIKE '%lab%'
+        AND subject NOT REGEXP '\\bLAB\\b'
       
     );
 END $$
@@ -993,9 +989,7 @@ BEGIN
         c.session_end = s.end_time
     WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
     AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
-    AND s.subject NOT LIKE '%LAB%'
-    AND s.subject NOT LIKE '%Lab%'
-    AND s.subject NOT LIKE '%lab%'
+    AND s.subject NOT REGEXP '\\bLAB\\b';
   
 
     UPDATE classrooms
@@ -1007,9 +1001,7 @@ BEGIN
         SELECT room_id FROM schedules
         WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
         AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
-        AND subject NOT LIKE '%LAB%'
-        AND subject NOT LIKE '%Lab%'
-        AND subject NOT LIKE '%lab%'
+        AND subject NOT REGEXP '\\bLAB\\b'
         
         
         
