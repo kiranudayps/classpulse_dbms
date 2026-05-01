@@ -956,8 +956,8 @@ BEGIN
         c.current_subject = s.subject,
         c.session_start = s.start_time,
         c.session_end = s.end_time
-    WHERE s.day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
-    AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
+    WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
+    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -966,8 +966,8 @@ BEGIN
         session_end = NULL
     WHERE id NOT IN (
         SELECT room_id FROM schedules
-        WHERE day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
-        AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
+        AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
     );
 END $$
 DELIMITER ;
@@ -983,8 +983,8 @@ BEGIN
         c.current_subject = s.subject,
         c.session_start = s.start_time,
         c.session_end = s.end_time
-    WHERE s.day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
-    AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
+    WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
+    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -993,8 +993,8 @@ BEGIN
         session_end = NULL
     WHERE id NOT IN (
         SELECT room_id FROM schedules
-        WHERE day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
-        AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
+        AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
     );
 END $$
 DELIMITER ;
