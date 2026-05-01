@@ -151,6 +151,41 @@ app.post('/api/login', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+// Room status sync scheduler (Runs every 1 minute)
+// Uses IST (UTC+5:30) to check current day and time against schedules
+setInterval(async () => {
+  try {
+    // Mark rooms as occupied if there is an ongoing class
+    await pool.query(`
+      UPDATE classrooms c
+      JOIN schedules s ON c.id = s.room_id
+      SET c.status = 'occupied',
+          c.current_subject = s.subject,
+          c.session_start = s.start_time,
+          c.session_end = s.end_time
+      WHERE s.day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
+      AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
+    `);
+
+    // Mark rooms as vacant if there is no ongoing class
+    await pool.query(`
+      UPDATE classrooms
+      SET status = 'vacant',
+          current_subject = NULL,
+          session_start = NULL,
+          session_end = NULL
+      WHERE id NOT IN (
+        SELECT room_id FROM schedules
+        WHERE day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
+        AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+      )
+    `);
+  } catch (err) {
+    console.error('[SYNC ERROR] Failed to sync room status:', err);
+  }
+}, 60000);
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`ClassPulse running on port ${PORT}`);
 });
