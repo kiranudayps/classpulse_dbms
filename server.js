@@ -85,6 +85,13 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// GET /api/time - Test timezone conversion
+app.get('/api/time', (req, res) => {
+  pool.query("SELECT NOW() as utc, CONVERT_TZ(NOW(), '+00:00', '+05:30') as ist, DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) as day, TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) as time")
+  .then(([rows]) => res.json(rows[0]))
+  .catch(err => res.status(500).json({error: err.message}));
+});
+
 // PATCH /api/room/:id/status - Update room status
 app.patch('/api/room/:id/status', async (req, res) => {
   const { status, sessionInfo, userId, userName } = req.body;
@@ -164,8 +171,8 @@ setInterval(async () => {
           c.current_subject = s.subject,
           c.session_start = s.start_time,
           c.session_end = s.end_time
-      WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-      AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
+      WHERE s.day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
+      AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
     `);
 
     // Mark rooms as vacant if there is no ongoing class
@@ -177,8 +184,8 @@ setInterval(async () => {
           session_end = NULL
       WHERE id NOT IN (
         SELECT room_id FROM schedules
-        WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-        AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        WHERE day = DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30'))
+        AND TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
       )
     `);
   } catch (err) {
