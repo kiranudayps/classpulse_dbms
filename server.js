@@ -7,6 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const useUTC = process.env.DB_UTC === 'true';
+const dayExpr = useUTC ? "DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))" : "DAYNAME(NOW())";
+const timeExpr = useUTC ? "TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))" : "TIME(NOW())";
+
 // Serve the frontend static HTML files
 app.use(express.static(path.join(__dirname)));
 app.use('/pages', express.static(path.join(__dirname, 'pages')));
@@ -87,7 +91,7 @@ app.get('/api/health', async (req, res) => {
 
 // GET /api/time - Test timezone conversion
 app.get('/api/time', (req, res) => {
-  pool.query("SELECT UTC_TIMESTAMP() as utc, CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30') as ist, DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) as day, TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) as time")
+  pool.query(`SELECT ${useUTC ? 'UTC_TIMESTAMP()' : 'NOW()'} as utc, ${dayExpr} as day, ${timeExpr} as time`)
   .then(([rows]) => res.json(rows[0]))
   .catch(err => res.status(500).json({error: err.message}));
 });
@@ -171,8 +175,8 @@ setInterval(async () => {
           c.current_subject = s.subject,
           c.session_start = s.start_time,
           c.session_end = s.end_time
-      WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-      AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
+      WHERE s.day = ${dayExpr}
+      AND ${timeExpr} BETWEEN s.start_time AND s.end_time
     `);
 
     // Mark rooms as vacant if there is no ongoing class
@@ -184,8 +188,8 @@ setInterval(async () => {
           session_end = NULL
       WHERE id NOT IN (
         SELECT room_id FROM schedules
-        WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-        AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        WHERE day = ${dayExpr}
+        AND ${timeExpr} BETWEEN start_time AND end_time
       )
     `);
   } catch (err) {
