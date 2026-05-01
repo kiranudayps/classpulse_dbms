@@ -1227,12 +1227,53 @@ DELIMITER ;
 SET GLOBAL event_scheduler = ON;
 
 DELIMITER $$
+CREATE PROCEDURE sp_sync_room_status()
+BEGIN
+    UPDATE classrooms c
+    JOIN schedules s ON c.id = s.room_id
+    SET c.status = 'occupied',
+        c.current_subject = s.subject,
+        c.session_start = s.start_time,
+        c.session_end = s.end_time
+    WHERE s.day = DAYNAME(NOW())
+    AND CURTIME() BETWEEN s.start_time AND s.end_time;
+
+    UPDATE classrooms
+    SET status = 'vacant',
+        current_subject = NULL,
+        session_start = NULL,
+        session_end = NULL
+    WHERE id NOT IN (
+        SELECT room_id FROM schedules
+        WHERE day = DAYNAME(NOW())
+        AND CURTIME() BETWEEN start_time AND end_time
+    );
+END $$
+DELIMITER ;
+
+DELIMITER $$
 CREATE EVENT evt_sync_room_status
 ON SCHEDULE EVERY 5 MINUTE
 DO
 BEGIN
+    UPDATE classrooms c
+    JOIN schedules s ON c.id = s.room_id
+    SET c.status = 'occupied',
+        c.current_subject = s.subject,
+        c.session_start = s.start_time,
+        c.session_end = s.end_time
+    WHERE s.day = DAYNAME(NOW())
+    AND CURTIME() BETWEEN s.start_time AND s.end_time;
+
     UPDATE classrooms
-    SET status = 'vacant', current_subject = NULL, current_faculty = NULL, session_start = NULL, session_end = NULL
-    WHERE status = 'occupied' AND session_end < CURRENT_TIME();
+    SET status = 'vacant',
+        current_subject = NULL,
+        session_start = NULL,
+        session_end = NULL
+    WHERE id NOT IN (
+        SELECT room_id FROM schedules
+        WHERE day = DAYNAME(NOW())
+        AND CURTIME() BETWEEN start_time AND end_time
+    );
 END $$
 DELIMITER ;
