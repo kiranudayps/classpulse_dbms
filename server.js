@@ -177,6 +177,9 @@ setInterval(async () => {
           c.session_end = s.end_time
       WHERE s.day = ${dayExpr}
       AND ${timeExpr} BETWEEN s.start_time AND s.end_time
+      AND s.subject NOT LIKE '%LAB%'
+      AND s.subject NOT LIKE '%Lab%'
+      AND s.subject NOT LIKE '%lab%'
     `);
 
     // Mark rooms as vacant if there is no ongoing class
@@ -190,6 +193,9 @@ setInterval(async () => {
         SELECT room_id FROM schedules
         WHERE day = ${dayExpr}
         AND ${timeExpr} BETWEEN start_time AND end_time
+        AND subject NOT LIKE '%LAB%'
+        AND subject NOT LIKE '%Lab%'
+        AND subject NOT LIKE '%lab%'
       )
     `);
   } catch (err) {

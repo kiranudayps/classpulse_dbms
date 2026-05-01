@@ -957,7 +957,10 @@ BEGIN
         c.session_start = s.start_time,
         c.session_end = s.end_time
     WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
+    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
+    AND s.subject NOT LIKE '%LAB%'
+    AND s.subject NOT LIKE '%Lab%'
+    AND s.subject NOT LIKE '%lab%';
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -968,6 +971,9 @@ BEGIN
         SELECT room_id FROM schedules
         WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
         AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        AND subject NOT LIKE '%LAB%'
+        AND subject NOT LIKE '%Lab%'
+        AND subject NOT LIKE '%lab%'
     );
 END $$
 DELIMITER ;
@@ -984,7 +990,10 @@ BEGIN
         c.session_start = s.start_time,
         c.session_end = s.end_time
     WHERE s.day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
-    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time;
+    AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN s.start_time AND s.end_time
+    AND s.subject NOT LIKE '%LAB%'
+    AND s.subject NOT LIKE '%Lab%'
+    AND s.subject NOT LIKE '%lab%';
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -995,6 +1004,9 @@ BEGIN
         SELECT room_id FROM schedules
         WHERE day = DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30'))
         AND TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) BETWEEN start_time AND end_time
+        AND subject NOT LIKE '%LAB%'
+        AND subject NOT LIKE '%Lab%'
+        AND subject NOT LIKE '%lab%'
     );
 END $$
 DELIMITER ;
