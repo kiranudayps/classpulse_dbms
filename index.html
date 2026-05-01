@@ -356,27 +356,32 @@
 <!-- Mobile Nav -->
 <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 md:hidden z-50"
      style="padding-bottom: env(safe-area-inset-bottom);">
-  <div class="flex justify-around items-center h-16">
-    <a class="flex flex-col items-center gap-1 text-primary" href="/">
+  <div class="flex justify-around items-center h-16 px-2">
+    <button onclick="showSection('home')" class="mob-nav-link flex flex-col items-center gap-1 text-primary transition-all" data-section="home">
       <span class="material-symbols-outlined">dashboard</span>
       <span class="text-[10px] font-bold">Dashboard</span>
+    </button>
+    <a class="flex flex-col items-center gap-1 text-slate-400 transition-all" href="/pages/labs.html">
+      <span class="material-symbols-outlined" style="color: #a855f7;">science</span>
+      <span class="text-[10px] font-medium">Labs</span>
     </a>
-    <a class="flex flex-col items-center gap-1" href="/pages/labs.html"
-       style="color: #a855f7; filter: drop-shadow(0 0 4px rgba(168,85,247,0.8));">
-      <span class="material-symbols-outlined">science</span>
-      <span class="text-[10px] font-bold">Labs</span>
-    </a>
-    <a class="flex flex-col items-center gap-1 text-slate-400" href="/pages/reserved.html">
+    <button onclick="showSection('founders')" class="mob-nav-link flex flex-col items-center gap-1 text-slate-400 transition-all" data-section="founders">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="text-[10px] font-medium">Founders</span>
+    </button>
+    <button onclick="showSection('about')" class="mob-nav-link flex flex-col items-center gap-1 text-slate-400 transition-all" data-section="about">
+      <span class="material-symbols-outlined">info</span>
+      <span class="text-[10px] font-medium">About</span>
+    </button>
+    <a class="flex flex-col items-center gap-1 text-slate-400 transition-all" href="/pages/reserved.html">
       <span class="material-symbols-outlined">event_available</span>
       <span class="text-[10px] font-medium">Reserved</span>
     </a>
-    <!-- Login: hidden when logged in -->
-    <a id="mob-login" class="flex flex-col items-center gap-1 text-slate-400" href="/pages/login.html">
+    <a id="mob-login" class="flex flex-col items-center gap-1 text-slate-400 transition-all" href="/pages/login.html">
       <span class="material-symbols-outlined">person</span>
       <span class="text-[10px] font-medium">Login</span>
     </a>
-    <!-- My Page: shown when logged in -->
-    <a id="mob-dashboard" class="flex flex-col items-center gap-1 text-primary" href="/pages/user-dashboard.html" style="display:none">
+    <a id="mob-dashboard" class="flex flex-col items-center gap-1 text-primary transition-all" href="/pages/user-dashboard.html" style="display:none">
       <span class="material-symbols-outlined">person</span>
       <span class="text-[10px] font-medium">My Page</span>
     </a>
@@ -411,6 +416,18 @@ function showSection(name) {
       btn.classList.add('text-slate-600','dark:text-slate-300','border-slate-200','dark:border-slate-700');
     }
   });
+  
+  // Update Mobile Nav items
+  document.querySelectorAll('.mob-nav-link').forEach(link => {
+    const isActive = link.getAttribute('data-section') === name;
+    link.classList.toggle('text-primary', isActive);
+    link.classList.toggle('text-slate-400', !isActive);
+    const label = link.querySelector('span:last-child');
+    if (label) {
+      label.classList.toggle('font-bold', isActive);
+      label.classList.toggle('font-medium', !isActive);
+    }
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -420,6 +437,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(id);
     if (el) el.textContent = icon;
   });
+
+  // Check for section parameter in URL (e.g. /?section=about)
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get('section');
+  if (section && ['home', 'founders', 'about'].includes(section)) {
+    showSection(section);
+  }
 });
 </script>
 <script type="module" src="/js/dashboard.js"></script>
