@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS nie_classpulse;
+﻿DROP DATABASE IF EXISTS nie_classpulse;
 CREATE DATABASE nie_classpulse;
 USE nie_classpulse;
 
@@ -961,9 +961,7 @@ BEGIN
     AND s.subject NOT LIKE '%LAB%'
     AND s.subject NOT LIKE '%Lab%'
     AND s.subject NOT LIKE '%lab%'
-    AND s.subject NOT LIKE '%Practical%'
-    AND s.subject NOT LIKE '%Workshop%'
-    AND s.subject NOT LIKE '%Tutorial%';
+  
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -977,9 +975,7 @@ BEGIN
         AND subject NOT LIKE '%LAB%'
         AND subject NOT LIKE '%Lab%'
         AND subject NOT LIKE '%lab%'
-        AND subject NOT LIKE '%Practical%'
-        AND subject NOT LIKE '%Workshop%'
-        AND subject NOT LIKE '%Tutorial%'
+      
     );
 END $$
 DELIMITER ;
@@ -1000,9 +996,7 @@ BEGIN
     AND s.subject NOT LIKE '%LAB%'
     AND s.subject NOT LIKE '%Lab%'
     AND s.subject NOT LIKE '%lab%'
-    AND s.subject NOT LIKE '%Practical%'
-    AND s.subject NOT LIKE '%Workshop%'
-    AND s.subject NOT LIKE '%Tutorial%';
+  
 
     UPDATE classrooms
     SET status = 'vacant',
@@ -1016,9 +1010,9 @@ BEGIN
         AND subject NOT LIKE '%LAB%'
         AND subject NOT LIKE '%Lab%'
         AND subject NOT LIKE '%lab%'
-        AND subject NOT LIKE '%Practical%'
-        AND subject NOT LIKE '%Workshop%'
-        AND subject NOT LIKE '%Tutorial%'
+        
+        
+        
     );
 END $$
 DELIMITER ;
