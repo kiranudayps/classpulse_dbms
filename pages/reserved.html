@@ -82,17 +82,49 @@
             const el = document.getElementById('theme-icon');
             if (el) el.textContent = isDark ? 'light_mode' : 'dark_mode';
         }
+
+        function renderBookings() {
+            const loading = document.getElementById('loading');
+            const empty = document.getElementById('empty-state');
+            const grid = document.getElementById('bookings-grid');
+            const bookings = JSON.parse(localStorage.getItem('classpulse_prebookings') || '[]');
+
+            if (loading) loading.classList.add('hidden');
+            if (!bookings.length) {
+                if (empty) empty.classList.remove('hidden');
+                if (grid) grid.classList.add('hidden');
+                return;
+            }
+
+            if (empty) empty.classList.add('hidden');
+            if (grid) {
+                grid.innerHTML = bookings.map(booking => `
+                    <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-sm">
+                        <div class="flex items-center justify-between gap-3 mb-5">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">${booking.day}</p>
+                                <h2 class="text-xl font-semibold text-slate-900 dark:text-white">${booking.room}</h2>
+                            </div>
+                            <span class="inline-flex rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold uppercase">${booking.status ? booking.status.replace(/prebooked/i, 'Prebooked') : 'Reserved'}</span>
+                        </div>
+                        <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                            <p><span class="font-semibold text-slate-900 dark:text-white">Subject:</span> ${booking.subject}</p>
+                            <p><span class="font-semibold text-slate-900 dark:text-white">Section:</span> ${booking.section}</p>
+                            <p><span class="font-semibold text-slate-900 dark:text-white">Time:</span> ${booking.start_time} – ${booking.end_time}</p>
+                        </div>
+                    </article>
+                `).join('');
+                grid.classList.remove('hidden');
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const isDark = document.documentElement.classList.contains('dark');
             const el = document.getElementById('theme-icon');
             if (el) el.textContent = isDark ? 'light_mode' : 'dark_mode';
-        });
 
-        // Show empty state after a brief delay (no Supabase in local MySQL version)
-        setTimeout(() => {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('empty-state').classList.remove('hidden');
-        }, 800);
+            renderBookings();
+        });
 
         // Show Pre-Book button only if logged in
         const user = localStorage.getItem('classpulse_user');

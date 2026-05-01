@@ -207,17 +207,24 @@ async function syncRoomStatus() {
     `);
 
     // Mark rooms as vacant if there is no ongoing class
+    // Preserve manually occupied classrooms until their manual session end time.
     await pool.query(`
       UPDATE classrooms
       SET status = 'vacant',
           current_subject = NULL,
+          current_faculty = NULL,
           session_start = NULL,
           session_end = NULL
       WHERE id NOT IN (
         SELECT room_id FROM schedules
         WHERE day = ${dayExpr}
         AND ${timeExpr} BETWEEN start_time AND end_time
-        AND subject NOT REGEXP '\\\\bLAB\\\\b'
+        AND subject NOT REGEXP '\\bLAB\\b'
+      )
+      AND NOT (
+        status = 'occupied'
+        AND session_end IS NOT NULL
+        AND ${timeExpr} < session_end
       )
     `);
     console.log(`[SYNC] Room status updated at ${new Date().toLocaleTimeString()}`);

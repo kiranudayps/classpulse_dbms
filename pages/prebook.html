@@ -42,18 +42,66 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <div class="flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-20 h-20 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-                <span class="material-symbols-outlined text-4xl text-primary">add_circle</span>
+        <div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+                <div class="w-20 h-20 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-4xl text-primary">add_circle</span>
+                </div>
+                <h1 class="text-3xl font-bold mb-3">Pre-Book a Classroom</h1>
+                <p class="text-slate-500 dark:text-gray-400 max-w-md leading-relaxed">
+                    Reserve a classroom in advance. Fill in the details below and submit your request.
+                </p>
             </div>
-            <h1 class="text-3xl font-bold mb-3">Pre-Book a Classroom</h1>
-            <p class="text-slate-500 dark:text-gray-400 max-w-md leading-relaxed">
-                Pre-booking feature coming soon. Contact your faculty or CR to reserve a classroom.
-            </p>
-            <a href="/" class="mt-8 flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Back to Dashboard
-            </a>
+
+            <form id="prebook-form" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Room number
+                        <input id="prebook-room" type="text" required placeholder="e.g. MB 101"
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Day
+                        <input id="prebook-day" type="text" required placeholder="e.g. Monday"
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Start time
+                        <input id="prebook-start" type="time" required
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        End time
+                        <input id="prebook-end" type="time" required
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Subject
+                        <input id="prebook-subject" type="text" required placeholder="e.g. Physics"
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Section
+                        <input id="prebook-section" type="text" placeholder="e.g. A1"
+                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    </label>
+                </div>
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <button id="prebook-submit" type="submit"
+                            class="inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">
+                        Submit Reservation
+                    </button>
+                    <a href="/" class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+                        Back to Dashboard
+                    </a>
+                </div>
+
+                <p id="prebook-message" class="text-sm text-center text-green-600 dark:text-green-400 hidden"></p>
+            </form>
         </div>
     </main>
 
@@ -65,10 +113,57 @@
             const el = document.getElementById('theme-icon');
             if (el) el.textContent = isDark ? 'light_mode' : 'dark_mode';
         }
+
+        function showPrebookMessage(message, isError = false) {
+            const msg = document.getElementById('prebook-message');
+            if (!msg) return;
+            msg.textContent = message;
+            msg.classList.toggle('text-red-500', isError);
+            msg.classList.toggle('text-green-600', !isError);
+            msg.classList.remove('hidden');
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const isDark = document.documentElement.classList.contains('dark');
             const el = document.getElementById('theme-icon');
             if (el) el.textContent = isDark ? 'light_mode' : 'dark_mode';
+
+            const form = document.getElementById('prebook-form');
+            if (!form) return;
+
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                const room = document.getElementById('prebook-room')?.value.trim();
+                const day = document.getElementById('prebook-day')?.value.trim();
+                const start = document.getElementById('prebook-start')?.value;
+                const end = document.getElementById('prebook-end')?.value;
+                const subject = document.getElementById('prebook-subject')?.value.trim();
+                const section = document.getElementById('prebook-section')?.value.trim();
+
+                if (!room || !day || !start || !end || !subject) {
+                    showPrebookMessage('Please fill in all required fields.', true);
+                    return;
+                }
+
+                const booking = {
+                    id: Date.now(),
+                    room,
+                    day,
+                    start_time: start,
+                    end_time: end,
+                    subject,
+                    section: section || 'N/A',
+                    status: 'prebooked',
+                    created_at: new Date().toISOString()
+                };
+
+                const saved = JSON.parse(localStorage.getItem('classpulse_prebookings') || '[]');
+                saved.push(booking);
+                localStorage.setItem('classpulse_prebookings', JSON.stringify(saved));
+
+                showPrebookMessage('Reservation saved. Redirecting to Reserved Classes...');
+                setTimeout(() => window.location.href = '/pages/reserved.html', 900);
+            });
         });
     </script>
 </body>
