@@ -138,26 +138,42 @@ app.patch('/api/room/:id/status', async (req, res) => {
   }
 });
 
-// LOGIN Endpoint (Simplified replacement for Supabase Auth)
+// LOGIN Endpoint (Universal Password Logic)
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password]);
-    if (rows.length > 0) {
-      const user = rows[0];
-      res.json({
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          full_name: user.full_name
-        }
-      });
-    } else {
-      res.status(401).json({ error: 'Invalid login credentials' });
+  const UNIVERSAL_PASSWORD = 'password123';
+
+  if (password === UNIVERSAL_PASSWORD) {
+    try {
+      // Try to find the user in the database first
+      const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+      
+      if (rows.length > 0) {
+        const user = rows[0];
+        res.json({
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            full_name: user.full_name
+          }
+        });
+      } else {
+        // If email doesn't exist in DB, allow login with a default teacher role
+        res.json({
+          user: {
+            id: Date.now(),
+            email: email,
+            role: 'teacher',
+            full_name: email.split('@')[0].toUpperCase()
+          }
+        });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
   }
 });
 
