@@ -31,7 +31,7 @@ app.get('/api/health', async (req, res) => {
 
 // GET /api/time - Test timezone conversion
 app.get('/api/time', (req, res) => {
-  pool.query("SELECT NOW() as utc, CONVERT_TZ(NOW(), '+00:00', '+05:30') as ist, DAYNAME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) as day, TIME(CONVERT_TZ(NOW(), '+00:00', '+05:30')) as time")
+  pool.query("SELECT UTC_TIMESTAMP() as utc, CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30') as ist, DAYNAME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) as day, TIME(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+05:30')) as time")
   .then(([rows]) => res.json(rows[0]))
   .catch(err => res.status(500).json({error: err.message}));
 });
