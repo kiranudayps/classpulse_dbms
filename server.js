@@ -143,10 +143,13 @@ app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   const UNIVERSAL_PASSWORD = 'password123';
 
+  console.log(`[LOGIN ATTEMPT] Email: ${email}, Password: ${password}`);
+
   if (password === UNIVERSAL_PASSWORD) {
     try {
       // Try to find the user in the database first
       const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+      console.log(`[DB SUCCESS] Found ${rows.length} users for this email.`);
       
       if (rows.length > 0) {
         const user = rows[0];
