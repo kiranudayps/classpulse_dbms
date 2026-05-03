@@ -27,9 +27,35 @@
     /* Hide scrollbar on floor tabs */
     .no-scrollbar::-webkit-scrollbar { display:none; }
     .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+
+    /* Background Video Styles */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+    #bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: -1;
+    }
   </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen transition-colors">
+
+<!-- Background Video -->
+<video autoplay muted loop id="bg-video">
+  <source src="/bg-video.mp4" type="video/mp4">
+</video>
+<div id="bg-overlay"></div>
 
 <!-- Nav -->
 <header class="sticky top-0 z-50 bg-white dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none">
