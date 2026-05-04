@@ -23,6 +23,8 @@ let activeFloor    = 'all'; // 'all' | 'Ground Floor' | '1st Floor' | '2nd Floor
 
 function floorLabel(room_number) {
   const n = String(room_number);
+  // Special case: MCA rooms 202-205 appear on Ground Floor for better visibility
+  if (n === '202' || n === '203' || n === '204' || n === '205') return 'Ground Floor';
   if (n.startsWith('MB')) return 'Ground Floor';
   if (n.startsWith('1'))  return 'Ground Floor';
   if (n.startsWith('2'))  return '1st Floor';

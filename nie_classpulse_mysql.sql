@@ -86,7 +86,14 @@ INSERT INTO classrooms (room_number, building, floor, department, semester, sect
 ('307', 'Ramanujacharya Block', '2nd Floor', 'IS', '6th', '6th IS-C', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
 ('308', 'Ramanujacharya Block', '2nd Floor', 'IS', '6th', '6th IS-D', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
 ('409', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-E', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
-('410', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-F', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant');
+('410', 'Ramanujacharya Block', '3rd Floor', 'AI & ML', '6th', '6th AIML-F', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+-- MCA Classrooms
+('202', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+('203', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+('204', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+('205', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+('208', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'),
+('209', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-B', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant');
 
 CREATE TEMPORARY TABLE tmp_schedule (
   room_number VARCHAR(10),
@@ -884,7 +891,55 @@ INSERT INTO tmp_schedule (room_number, day, start_time, end_time, subject, secti
 ('410', 'Friday', '11:30', '12:30', 'CV', '6th AIML-F', '6th'),
 ('410', 'Friday', '12:30', '13:30', 'INS', '6th AIML-F', '6th'),
 ('410', 'Friday', '14:30', '15:30', 'MC&ES/DL Lab', '6th AIML-F', '6th'),
-('410', 'Friday', '15:30', '16:30', 'MC&ES/DL Lab', '6th AIML-F', '6th');
+('410', 'Friday', '15:30', '16:30', 'MC&ES/DL Lab', '6th AIML-F', '6th'),
+-- MCA Timetable (Room 208 - MCA-A)
+-- MONDAY
+('208','Monday','11:30','12:30','WAD','MCA-A','2nd'),
+('208','Monday','12:30','13:30','JAVA','MCA-A','2nd'),
+('208','Monday','14:30','15:30','SE','MCA-A','2nd'),
+('208','Monday','15:30','16:30','MLDAP','MCA-A','2nd'),
+-- TUESDAY
+('208','Tuesday','09:00','10:00','MLDAP','MCA-A','2nd'),
+('208','Tuesday','10:00','11:00','SE','MCA-A','2nd'),
+('208','Tuesday','11:30','12:30','WAD','MCA-A','2nd'),
+('208','Tuesday','12:30','13:30','JAVA','MCA-A','2nd'),
+('208','Tuesday','14:30','15:30','DSA','MCA-A','2nd'),
+('208','Tuesday','15:30','16:30','JAVA','MCA-A','2nd'),
+-- WEDNESDAY
+('208','Wednesday','09:00','10:00','JAVA','MCA-A','2nd'),
+('208','Wednesday','11:30','12:30','SE','MCA-A','2nd'),
+('208','Wednesday','12:30','13:30','WAD','MCA-A','2nd'),
+-- THURSDAY
+('208','Thursday','09:00','10:00','WAD','MCA-A','2nd'),
+('208','Thursday','10:00','11:00','DSA','MCA-A','2nd'),
+('208','Thursday','11:30','12:30','MLDAP','MCA-A','2nd'),
+('208','Thursday','12:30','13:30','JAVA','MCA-A','2nd'),
+-- FRIDAY
+('208','Friday','09:00','10:00','DSA','MCA-A','2nd'),
+('208','Friday','10:00','11:00','JAVA','MCA-A','2nd'),
+('208','Friday','11:30','12:30','SE','MCA-A','2nd'),
+-- MCA Timetable (Room 209 - MCA-B)
+-- MONDAY
+('209','Monday','09:00','10:00','JAVA','MCA-B','2nd'),
+('209','Monday','10:00','11:00','MLDAP','MCA-B','2nd'),
+('209','Monday','14:30','15:30','SE','MCA-B','2nd'),
+('209','Monday','15:30','16:30','DSA','MCA-B','2nd'),
+-- TUESDAY
+('209','Tuesday','09:00','10:00','DSA','MCA-B','2nd'),
+('209','Tuesday','10:00','11:00','MLDAP','MCA-B','2nd'),
+('209','Tuesday','11:30','12:30','WAD','MCA-B','2nd'),
+('209','Tuesday','12:30','13:30','JAVA','MCA-B','2nd'),
+-- WEDNESDAY
+('209','Wednesday','10:00','11:00','JAVA','MCA-B','2nd'),
+('209','Wednesday','11:30','12:30','SE','MCA-B','2nd'),
+('209','Wednesday','12:30','13:30','WAD','MCA-B','2nd'),
+-- THURSDAY
+('209','Thursday','11:30','12:30','MLDAP','MCA-B','2nd'),
+('209','Thursday','12:30','13:30','DSA','MCA-B','2nd'),
+('209','Thursday','14:30','15:30','WAD','MCA-B','2nd'),
+('209','Thursday','15:30','16:30','JAVA','MCA-B','2nd'),
+-- FRIDAY
+('209','Friday','11:30','12:30','SE','MCA-B','2nd');
 
 INSERT INTO schedules (room_id, room_number, day, start_time, end_time, subject, section, semester)
 SELECT c.id, t.room_number, t.day, t.start_time, t.end_time, t.subject, t.section, t.semester
@@ -1008,3 +1063,16 @@ BEGIN
     );
 END $$
 DELIMITER ;
+
+-- Safe insert for MCA rooms 202-205 (if not already present)
+INSERT INTO classrooms (room_number, building, floor, department, semester, section, capacity, facilities, status)
+SELECT room_number, building, floor, department, semester, section, capacity, facilities, status FROM (
+  SELECT '202' AS room_number, 'Ramanujacharya Block' AS building, '1st Floor' AS floor, 'MCA' AS department, '2nd' AS semester, 'MCA-A' AS section, 60 AS capacity, 'Projector, Whiteboard, Wi-Fi' AS facilities, 'vacant' AS status
+  UNION ALL
+  SELECT '203', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'
+  UNION ALL
+  SELECT '204', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'
+  UNION ALL
+  SELECT '205', 'Ramanujacharya Block', '1st Floor', 'MCA', '2nd', 'MCA-A', 60, 'Projector, Whiteboard, Wi-Fi', 'vacant'
+) AS v
+WHERE NOT EXISTS (SELECT 1 FROM classrooms c WHERE c.room_number = v.room_number);
