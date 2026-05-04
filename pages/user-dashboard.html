@@ -24,9 +24,25 @@
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     /* MOBILE FIX: smooth scroll on iOS for the table */
     #table-wrap { -webkit-overflow-scrolling: touch; }
+    
+    /* Background Video Styles */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
+<body class="bg-slate-50/80 dark:bg-slate-950/80 min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
+
+<!-- Background Video -->
+<video autoplay muted loop id="bg-video">
+  <source src="/mp_.mp4" type="video/mp4">
+</video>
 
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
