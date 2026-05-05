@@ -47,6 +47,24 @@
       background: rgba(0, 0, 0, 0.3);
       z-index: -1;
     }
+    /* Logo responsive styling */
+    header .site-logo {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      object-fit: cover;
+      border-radius: 0.75rem;
+      transition: transform 0.2s ease;
+    }
+    header .site-logo:hover {
+      transform: scale(1.05);
+    }
+    @media (max-width: 640px) {
+      header .site-logo {
+        width: 34px;
+        height: 34px;
+      }
+    }
   </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen transition-colors">
@@ -62,7 +80,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center gap-3">
-        <img src="/logo.png" alt="NIE ClassPulse" class="h-10 w-10 rounded-xl object-cover" onerror="this.style.display='none';document.getElementById('nav-logo-fallback').style.display='flex'"/>
+        <img src="/logo.png" alt="NIE ClassPulse" class="site-logo h-10 w-10 rounded-xl object-cover" onerror="this.style.display='none';document.getElementById('nav-logo-fallback').style.display='flex'"/>
         <div id="nav-logo-fallback" style="display:none" class="bg-primary p-1.5 rounded-lg text-white">
           <span class="material-symbols-outlined block">pulse_alert</span>
         </div>
