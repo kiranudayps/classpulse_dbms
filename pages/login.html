@@ -14,11 +14,27 @@
     }
   </script>
   <title>Login — NIE ClassPulse</title>
-  <style>body{ font-family:'Lexend',sans-serif; }</style>
+  <style>
+    body{ font-family:'Lexend',sans-serif; }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex items-center justify-center p-4 transition-colors">
+<body class="bg-slate-50/80 dark:bg-slate-950/80 min-h-screen flex items-center justify-center p-4 transition-colors">
 
-<div class="w-full max-w-sm">
+<!-- Background Video -->
+<video autoplay muted loop id="bg-video">
+  <source src="/mp_.mp4" type="video/mp4">
+</video>
+
+<div class="w-full max-w-sm relative z-10">
 
   <!-- Logo -->
   <div class="text-center mb-8">
