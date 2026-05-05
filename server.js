@@ -74,6 +74,26 @@ app.get('/api/available-rooms', async (req, res) => {
   }
 });
 
+// POST /api/book-room - Book a room
+app.post('/api/book-room', async (req, res) => {
+  const { room_number, date, start_time, end_time, subject, faculty } = req.body;
+
+  if (!room_number || !date || !start_time || !end_time || !subject) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    await pool.query(`
+      INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [room_number, date, start_time, end_time, subject, faculty]);
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/room/:id - Get a specific room
 app.get('/api/room/:id', async (req, res) => {
   try {

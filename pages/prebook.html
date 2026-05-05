@@ -1,111 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pre-Book a Class</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-body { font-family: 'Lexend', sans-serif; }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode:'class',
+      theme:{ extend:{ colors:{ primary:"#137fec" }, fontFamily:{ display:["Lexend"] } } }
+    }
+  </script>
+  <title>Pre-Book a Class — NIE ClassPulse</title>
+  <meta name="description" content="Pre-book classrooms on NIE ClassPulse. Reserve rooms in advance for your classes and group study sessions.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://nieclasspulse.vercel.app/pages/prebook.html">
+  <meta property="og:title" content="Pre-Book a Class - NIE ClassPulse">
+  <meta property="og:description" content="Reserve classrooms in advance at NIE.">
+  <meta property="og:image" content="https://nieclasspulse.vercel.app/logo.png">
+  <meta property="og:url" content="https://nieclasspulse.vercel.app/pages/prebook.html">
+  <meta property="og:type" content="website">
+  <style>
+    body { font-family:'Lexend',sans-serif; }
+    .loader { width:36px;height:36px;border:4px solid #e2e8f0;border-top-color:#137fec;border-radius:50%;animation:spin .8s linear infinite; }
+    .loader-sm { width:20px;height:20px;border:3px solid #e2e8f0;border-top-color:#137fec;border-radius:50%;animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    /* Fix date/time input styling in dark mode */
+    input[type="date"],
+    input[type="time"] {
+      color-scheme: light;
+    }
+    .dark input[type="date"],
+    .dark input[type="time"] {
+      color-scheme: dark;
+      background-color: #334155;
+      color: #f1f5f9;
+      border-color: #475569;
+    }
+  </style>
 </head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
 
-<body class="bg-slate-900 text-white min-h-screen">
-
-<header class="p-4 border-b border-slate-700 flex justify-between">
-  <h1 class="font-bold">NIE ClassPulse</h1>
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5">
+      <img src="/logo.png" alt="NIE ClassPulse" class="h-9 w-9 rounded-xl object-cover"
+           onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'"/>
+      <div id="logo-fallback" style="display:none" class="bg-primary p-1.5 rounded-lg text-white">
+        <span class="material-symbols-outlined text-sm">pulse_alert</span>
+      </div>
+      <span class="font-bold text-lg">NIE ClassPulse</span>
+    </a>
+    <div class="flex items-center gap-2">
+      <a href="/pages/reserved.html"
+         class="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-lg transition-colors">
+        <span class="material-symbols-outlined text-base">event_available</span>
+        <span class="hidden sm:inline">Reserved Classes</span>
+      </a>
+      <button onclick="toggleTheme()"
+              class="size-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+        <span id="theme-icon" class="material-symbols-outlined text-slate-600 dark:text-slate-300 text-xl">dark_mode</span>
+      </button>
+    </div>
+  </div>
 </header>
 
-<main class="max-w-6xl mx-auto p-6">
+<!-- Auth guard -->
+<div id="auth-error" class="hidden max-w-md mx-auto px-4 py-24 text-center">
+  <span class="material-symbols-outlined text-5xl text-slate-300 block mb-3">lock</span>
+  <p class="font-medium text-slate-500">Login required to pre-book a class.</p>
+  <a href="/pages/login.html"
+     class="mt-4 inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors">
+    <span class="material-symbols-outlined text-base">login</span>Go to Login
+  </a>
+</div>
 
-  <h2 class="text-2xl font-bold mb-6">Pre-Book a Class</h2>
+<main id="main-content" class="hidden max-w-5xl mx-auto px-4 py-8 pb-24">
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <!-- LEFT FORM -->
-    <div class="bg-slate-800 p-6 rounded-xl">
-
-      <label>Date</label>
-      <input id="date" type="date" class="w-full mb-3 p-2 rounded bg-slate-700"/>
-
-      <div class="flex gap-3 mb-3">
-        <input id="start" type="time" class="w-full p-2 rounded bg-slate-700"/>
-        <input id="end" type="time" class="w-full p-2 rounded bg-slate-700"/>
-      </div>
-
-      <input id="subject" placeholder="Subject" class="w-full mb-3 p-2 rounded bg-slate-700"/>
-
-      <button id="searchBtn"
-        class="w-full bg-blue-600 py-3 rounded-lg font-semibold">
-        Find Available Rooms
-      </button>
-
-    </div>
-
-    <!-- RIGHT RESULT -->
+  <!-- Page title -->
+  <div class="flex items-center gap-3 mb-6">
+    <span class="material-symbols-outlined text-primary text-2xl">add_circle</span>
     <div>
-
-      <h3 class="font-bold mb-3">Available Rooms</h3>
-
-      <div id="loading" class="hidden">Loading...</div>
-
-      <div id="empty" class="hidden text-gray-400">
-        No rooms available
-      </div>
-
-      <div id="rooms"></div>
-
+      <h1 class="text-2xl font-bold">Pre-Book a Class</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Reserve a classroom up to 2 days in advance</p>
     </div>
-
   </div>
 
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Booking Form -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+      <h2 class="font-bold text-base mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-xl">edit_calendar</span>
+        Booking Details
+      </h2>
+
+      <div class="space-y-4">
+
+        <!-- Date -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Date</label>
+          <input id="inp-date" type="date"
+                 class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
+        </div>
+
+        <!-- Time -->
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">From</label>
+            <input id="inp-start" type="time"
+                   class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
+          </div>
+          <div class="flex-1">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">To</label>
+            <input id="inp-end" type="time"
+                   class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Subject *</label>
+          <input id="inp-subject" type="text" placeholder="e.g. Data Structures"
+                 class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
+        </div>
+
+        <!-- Faculty -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Faculty Name (optional)</label>
+          <input id="inp-faculty" type="text" placeholder="e.g. Dr. Sharma"
+                 class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
+        </div>
+
+        <p id="form-error" class="text-red-500 text-xs hidden"></p>
+
+        <!-- Search button -->
+        <button id="search-btn"
+                class="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">search</span>Find Available Rooms
+        </button>
+      </div>
+    </div>
+
+    <!-- Available Rooms -->
+    <div>
+      <h2 class="font-bold text-base mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-xl">meeting_room</span>
+        Available Rooms
+        <span id="rooms-count" class="text-sm text-slate-400 font-normal"></span>
+      </h2>
+
+      <div id="rooms-placeholder" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400">
+        <span class="material-symbols-outlined text-4xl block mb-2">search</span>
+        <p class="text-sm">Fill in the form and click "Find Available Rooms"</p>
+      </div>
+
+      <div id="rooms-loading" class="hidden flex justify-center py-12">
+        <div class="loader"></div>
+      </div>
+
+      <div id="rooms-empty" class="hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400">
+        <span class="material-symbols-outlined text-4xl block mb-2">event_busy</span>
+        <p class="text-sm font-medium">No rooms available for this slot</p>
+        <p class="text-xs mt-1">All rooms are either occupied or have timetable classes at this time.</p>
+      </div>
+
+      <div id="rooms-grid" class="hidden space-y-3"></div>
+    </div>
+  </div>
 </main>
 
-<script>
-document.getElementById("searchBtn").addEventListener("click", async () => {
+<!-- Success popup -->
+<div id="success-popup" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+    <div class="size-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
+      <span class="material-symbols-outlined text-green-600 text-3xl">check_circle</span>
+    </div>
+    <h3 class="text-lg font-bold mb-1">Booking Confirmed!</h3>
+    <p id="popup-msg" class="text-sm text-slate-500 dark:text-slate-400 mb-5"></p>
+    <button onclick="document.getElementById('success-popup').classList.add('hidden')"
+            class="w-full bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-primary/90 transition-colors">
+      Done
+    </button>
+  </div>
+</div>
 
-  const date = document.getElementById("date").value;
-  const start = document.getElementById("start").value;
-  const end = document.getElementById("end").value;
+<script>
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const isDark = document.documentElement.classList.contains('dark');
+  document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+});
+
+// show page (no auth blocking)
+document.getElementById('main-content').classList.remove('hidden');
+
+// set date limits (same behavior)
+const now = new Date();
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('inp-date').value = today;
+
+const max = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
+  .toISOString().split('T')[0];
+
+document.getElementById('inp-date').min = today;
+document.getElementById('inp-date').max = max;
+
+
+// SEARCH BUTTON
+document.getElementById('search-btn').addEventListener('click', async () => {
+
+  const date = document.getElementById('inp-date').value;
+  const start = document.getElementById('inp-start').value;
+  const end = document.getElementById('inp-end').value;
+  const subject = document.getElementById('inp-subject').value.trim();
+  const faculty = document.getElementById('inp-faculty').value.trim();
+
+  const errEl = document.getElementById('form-error');
+  errEl.classList.add('hidden');
 
   if (!date || !start || !end) {
-    alert("Fill all fields");
+    errEl.textContent = 'Fill all fields';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  if (!subject) {
+    errEl.textContent = 'Enter subject';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  if (start >= end) {
+    errEl.textContent = 'End time must be after start';
+    errEl.classList.remove('hidden');
     return;
   }
 
   const day = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
 
-  document.getElementById("loading").classList.remove("hidden");
-  document.getElementById("rooms").innerHTML = "";
-  document.getElementById("empty").classList.add("hidden");
+  document.getElementById('rooms-placeholder').classList.add('hidden');
+  document.getElementById('rooms-empty').classList.add('hidden');
+  document.getElementById('rooms-grid').classList.add('hidden');
+  document.getElementById('rooms-loading').classList.remove('hidden');
 
   try {
     const res = await fetch(`/api/available-rooms?day=${day}&start=${start}&end=${end}`);
-    const data = await res.json();
+    const rooms = await res.json();
 
-    document.getElementById("loading").classList.add("hidden");
+    document.getElementById('rooms-loading').classList.add('hidden');
 
-    if (!data.length) {
-      document.getElementById("empty").classList.remove("hidden");
+    if (!rooms.length) {
+      document.getElementById('rooms-empty').classList.remove('hidden');
       return;
     }
 
-    document.getElementById("rooms").innerHTML = data.map(r => `
-      <div class="bg-slate-800 p-3 rounded mb-2 flex justify-between">
-        <span>${r.room_number}</span>
-        <button class="bg-green-600 px-3 py-1 rounded">Book</button>
+    document.getElementById('rooms-count').textContent = `(${rooms.length} available)`;
+
+    const grid = document.getElementById('rooms-grid');
+    grid.classList.remove('hidden');
+
+    grid.innerHTML = rooms.map(r => `
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between">
+        <div>
+          <p class="font-bold text-lg">${r.room_number}</p>
+          <p class="text-xs text-slate-500">${r.building || ''}</p>
+        </div>
+        <button onclick="bookRoom('${r.room_number}', '${date}', '${start}', '${end}', '${subject}', '${faculty}')"
+          class="bg-primary text-white px-4 py-2 rounded-lg">
+          Book
+        </button>
       </div>
     `).join("");
 
   } catch (err) {
-    console.error(err);
+    document.getElementById('rooms-loading').classList.add('hidden');
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
   }
 
 });
+
+
+// BOOK FUNCTION (MYSQL)
+async function bookRoom(room, date, start, end, subject, faculty) {
+
+  try {
+    const res = await fetch('/api/book-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        room_number: room,
+        date,
+        start_time: start,
+        end_time: end,
+        subject,
+        faculty: faculty || null
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    document.getElementById('popup-msg').textContent =
+      `Room ${room} booked successfully`;
+
+    document.getElementById('success-popup').classList.remove('hidden');
+
+  } catch (err) {
+    alert("Booking failed");
+  }
+
+}
 </script>
 
+<script type="module">
+  import { supabase } from '/js/supabase.js';
+  import { getUser, getDisplayEmail } from '/js/auth.js';
+
+  // Auth guard
+  const user = await getUser();
+  if (!user) {
+    document.getElementById('auth-error').classList.remove('hidden');
+    setTimeout(() => { window.location.href = '/pages/login.html'; }, 2000);
+  } else {
+    document.getElementById('main-content').classList.remove('hidden');
+    init(user);
+  }
+
+  function init(user) {
+    // Use Intl formatter to ensure exact IST dates regardless of browser configuration
+    const now = new Date();
+    const ptDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+    const yr = ptDate.find(p => p.type === 'year').value;
+    const mo = ptDate.find(p => p.type === 'month').value;
+    const da = ptDate.find(p => p.type === 'day').value;
+    const todayStr = `${yr}-${mo}-${da}`;
+    
+    // Add 2 days for max date
+    const later = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+    const ptMax = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(later);
+    const maxDate = `${ptMax.find(p=>p.type==='year').value}-${ptMax.find(p=>p.type==='month').value}-${ptMax.find(p=>p.type==='day').value}`;
+
+    const dateInput = document.getElementById('inp-date');
+    dateInput.value = todayStr;
+    dateInput.min   = todayStr;
+    dateInput.max   = maxDate;
+
+    document.getElementById('search-btn').addEventListener('click', () => searchRooms(user));
+  }
+
+  async function searchRooms(user) {
+    const date    = document.getElementById('inp-date').value;
+    const start   = document.getElementById('inp-start').value;
+    const end     = document.getElementById('inp-end').value;
+    const subject = document.getElementById('inp-subject').value.trim();
+    const errEl   = document.getElementById('form-error');
+
+    errEl.classList.add('hidden');
+
+    if (!date || !start || !end) {
+      errEl.textContent = 'Please fill in date, start time and end time.';
+      errEl.classList.remove('hidden'); return;
+    }
+    if (!subject) {
+      errEl.textContent = 'Please enter a subject name.';
+      errEl.classList.remove('hidden'); return;
+    }
+    if (start >= end) {
+      errEl.textContent = 'End time must be after start time.';
+      errEl.classList.remove('hidden'); return;
+    }
+
+    document.getElementById('rooms-placeholder').classList.add('hidden');
+    document.getElementById('rooms-empty').classList.add('hidden');
+    document.getElementById('rooms-grid').classList.add('hidden');
+    document.getElementById('rooms-loading').classList.remove('hidden');
+    document.getElementById('rooms-count').textContent = '';
+
+    try {
+      // Get all rooms
+      const { data: allRooms, error: rErr } = await supabase
+        .from('classrooms').select('*').order('room_number');
+      if (rErr) throw rErr;
+
+      // Get timetable schedules that clash
+      const dayName = new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday:'long' });
+      const { data: schedules } = await supabase
+        .from('schedules')
+        .select('room_id, start_time, end_time, subject, is_lab')
+        .eq('day', dayName)
+        .lt('start_time', end + ':00')
+        .gt('end_time', start + ':00');
+
+      const timetableClash = new Set();
+
+      const grouped = {};
+
+      (schedules || []).forEach(s => {
+        if (!grouped[s.room_id]) grouped[s.room_id] = [];
+        grouped[s.room_id].push(s);
+      });
+
+      Object.entries(grouped).forEach(([roomId, slots]) => {
+        const startTimes = slots.map(s => s.start_time.substring(0,5));
+
+        const isTwoHourSlot =
+          (startTimes.includes('09:00') && startTimes.includes('10:00')) ||
+          (startTimes.includes('11:30') && startTimes.includes('12:30')) ||
+          (startTimes.includes('14:30') && startTimes.includes('15:30'));
+
+        // 🔥 IMPORTANT: CHECK BUILDING
+        const room = allRooms.find(r => r.id == roomId);
+
+        const isLabBuilding =
+          room && room.building.toLowerCase().includes('lab');
+
+        // ✅ ONLY treat as lab if:
+        // 1. 2-hour slot
+        // 2. NOT in classroom building
+        const isLab = isTwoHourSlot && isLabBuilding;
+
+        if (!isLab) {
+          timetableClash.add(Number(roomId));
+        }
+      });
+      // Get existing bookings that clash
+      const { data: bookings } = await supabase
+  .from('bookings')
+  .select('room_id, start_time, end_time, subject')
+  .eq('date', date)
+  .lt('start_time', end + ':00')
+  .gt('end_time', start + ':00');
+      
+     const bookingClash = new Set((bookings || [])
+  .map(b => b.room_id));
+      // Filter available rooms
+      const available = allRooms.filter(r =>
+        !timetableClash.has(r.id) && !bookingClash.has(r.id)
+      );
+
+      document.getElementById('rooms-loading').classList.add('hidden');
+
+      if (!available.length) {
+        document.getElementById('rooms-empty').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('rooms-count').textContent = `(${available.length} available)`;
+      const grid = document.getElementById('rooms-grid');
+      grid.classList.remove('hidden');
+      grid.innerHTML = available.map(r => buildRoomCard(r)).join('');
+
+      grid.querySelectorAll('.book-btn').forEach(btn => {
+        btn.addEventListener('click', () => bookRoom(btn.dataset.id, btn.dataset.number, user, date, start, end, subject));
+      });
+
+    } catch (err) {
+      document.getElementById('rooms-loading').classList.add('hidden');
+      errEl.textContent = 'Error: ' + err.message;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  function buildRoomCard(room) {
+    const floor = floorLabel(room.room_number);
+    return `
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between gap-3">
+        <div>
+          <p class="font-bold text-lg">${room.room_number}</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">${room.building} • ${floor}</p>
+        </div>
+        <button class="book-btn flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shrink-0"
+                data-id="${room.id}" data-number="${room.room_number}">
+          <span class="material-symbols-outlined text-base">add_circle</span>Book
+        </button>
+      </div>`;
+  }
+
+  async function bookRoom(roomId, roomNumber, user, date, start, end, subject) {
+    const faculty = document.getElementById('inp-faculty').value.trim();
+    const displayEmail = getDisplayEmail() || user.email;
+
+    const { error } = await supabase.from('bookings').insert({
+      room_id:    roomId,
+      room_number: roomNumber,
+      booked_by:  displayEmail,
+      subject:    subject,
+      faculty:    faculty || null,
+      date:       date,
+      start_time: start + ':00',
+      end_time:   end + ':00',
+    });
+
+    if (error) { alert('Error: ' + error.message); return; }
+
+    const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' });
+    document.getElementById('popup-msg').textContent =
+      `Room ${roomNumber} booked for ${fmtDate}, ${fmtTime(start)} – ${fmtTime(end)}`;
+    document.getElementById('success-popup').classList.remove('hidden');
+
+    // Refresh available rooms
+    await searchRooms(user);
+  }
+
+  function floorLabel(n) {
+    n = String(n);
+    if (n.startsWith('MB')) return 'Ground Floor';
+    if (n.startsWith('1'))  return 'Ground Floor';
+    if (n.startsWith('2'))  return '1st Floor';
+    if (n.startsWith('3'))  return '2nd Floor';
+    if (n.startsWith('4'))  return '3rd Floor';
+    return '';
+  }
+
+  function fmtTime(t) {
+    if (!t) return '';
+    const [h, m] = t.substring(0,5).split(':').map(Number);
+    return `${h > 12 ? h-12 : h === 0 ? 12 : h}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM':'AM'}`;
+  }
+</script>
+<script src="/js/chaos-bg.js?v=6.0"></script>
 </body>
 </html>

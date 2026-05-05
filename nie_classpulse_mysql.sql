@@ -47,6 +47,18 @@ CREATE TABLE schedules (
   FOREIGN KEY (room_id) REFERENCES classrooms(id) ON DELETE CASCADE
 );
 
+CREATE TABLE bookings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  room_number VARCHAR(10) NOT NULL,
+  date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  faculty VARCHAR(100),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_room_date (room_number, date)
+);
+
 CREATE TABLE room_audit (
   audit_id INT AUTO_INCREMENT PRIMARY KEY,
   room_id INT,
