@@ -56,54 +56,48 @@
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-            <div class="flex flex-col items-center justify-center py-10 text-center">
-                <div class="w-20 h-20 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-                    <span class="material-symbols-outlined text-4xl text-primary">add_circle</span>
-                </div>
-                <h1 class="text-3xl font-bold mb-3">Pre-Book a Classroom</h1>
-                <p class="text-slate-500 dark:text-gray-400 max-w-md leading-relaxed">
-                    Reserve a classroom in advance. Fill in the details below and submit your request.
-                </p>
-            </div>
+    <main class="flex justify-center items-center min-h-[85vh] px-4">
 
-            <div class="max-w-xl mx-auto mt-10 bg-slate-900/90 p-8 rounded-2xl border border-slate-800 shadow-lg">
+      <div class="w-full max-w-xl bg-slate-900/90 p-8 rounded-2xl border border-slate-800 shadow-lg">
 
-              <h2 class="text-2xl font-bold text-center mb-2">Pre-Book a Classroom</h2>
-              <p class="text-center text-slate-400 text-sm mb-6">
-                Reserve a classroom in advance. Fill in the details below.
-              </p>
-
-              <div class="grid grid-cols-1 gap-4">
-
-                <input type="text" id="room-number" placeholder="Room number (e.g. MB 101)"
-                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-
-                <input type="text" id="day" placeholder="Day (e.g. Monday)"
-                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <input type="time" id="start-time"
-                    class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-                  <input type="time" id="end-time"
-                    class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-                </div>
-
-                <input type="text" id="subject" placeholder="Subject (e.g. Physics)"
-                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-
-                <input type="text" id="section" placeholder="Section (e.g. A1)"
-                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
-
-                <button
-                  class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition">
-                  Submit Reservation
-                </button>
-
-              </div>
-            </div>
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-primary text-3xl">add_circle</span>
+          </div>
+          <h1 class="text-2xl font-bold">Pre-Book a Classroom</h1>
+          <p class="text-slate-400 text-sm mt-2">
+            Reserve a classroom in advance. Fill in the details below.
+          </p>
         </div>
+
+        <div class="grid grid-cols-2 gap-4">
+
+          <input placeholder="e.g. MB 101"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+          <input placeholder="e.g. Monday"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+          <input type="time"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+          <input type="time"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+          <input placeholder="e.g. Physics"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+          <input placeholder="e.g. A1"
+            class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+        </div>
+
+        <button class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl">
+          Submit Reservation
+        </button>
+
+      </div>
+
     </main>
 
     <script>
