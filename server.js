@@ -43,6 +43,37 @@ app.get('/api/rooms', async (req, res) => {
   }
 });
 
+// GET available rooms for a time slot
+app.get('/api/available-rooms', async (req, res) => {
+  const { day, start, end } = req.query;
+
+  if (!day || !start || !end) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
+
+  try {
+    const [rows] = await pool.query(`
+      SELECT * FROM classrooms c
+      WHERE c.id NOT IN (
+        SELECT room_id FROM schedules
+        WHERE day = ?
+        AND (
+          (? BETWEEN start_time AND end_time)
+          OR
+          (? BETWEEN start_time AND end_time)
+          OR
+          (start_time BETWEEN ? AND ?)
+        )
+      )
+      ORDER BY c.room_number
+    `, [day, start, end, start, end]);
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/room/:id - Get a specific room
 app.get('/api/room/:id', async (req, res) => {
   try {
