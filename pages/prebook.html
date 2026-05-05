@@ -68,55 +68,41 @@
                 </p>
             </div>
 
-            <form id="prebook-form" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Room number
-                        <input id="prebook-room" type="text" required placeholder="e.g. MB 101"
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Day
-                        <input id="prebook-day" type="text" required placeholder="e.g. Monday"
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Start time
-                        <input id="prebook-start" type="time" required
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        End time
-                        <input id="prebook-end" type="time" required
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
+            <div class="max-w-xl mx-auto mt-10 bg-slate-900/90 p-8 rounded-2xl border border-slate-800 shadow-lg">
+
+              <h2 class="text-2xl font-bold text-center mb-2">Pre-Book a Classroom</h2>
+              <p class="text-center text-slate-400 text-sm mb-6">
+                Reserve a classroom in advance. Fill in the details below.
+              </p>
+
+              <div class="grid grid-cols-1 gap-4">
+
+                <input type="text" id="room-number" placeholder="Room number (e.g. MB 101)"
+                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+                <input type="text" id="day" placeholder="Day (e.g. Monday)"
+                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <input type="time" id="start-time"
+                    class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
+                  <input type="time" id="end-time"
+                    class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Subject
-                        <input id="prebook-subject" type="text" required placeholder="e.g. Physics"
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Section
-                        <input id="prebook-section" type="text" placeholder="e.g. A1"
-                               class="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    </label>
-                </div>
+                <input type="text" id="subject" placeholder="Subject (e.g. Physics)"
+                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
 
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <button id="prebook-submit" type="submit"
-                            class="inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">
-                        Submit Reservation
-                    </button>
-                    <a href="/" class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
-                        Back to Dashboard
-                    </a>
-                </div>
+                <input type="text" id="section" placeholder="Section (e.g. A1)"
+                  class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white"/>
 
-                <p id="prebook-message" class="text-sm text-center text-green-600 dark:text-green-400 hidden"></p>
-            </form>
+                <button
+                  class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition">
+                  Submit Reservation
+                </button>
+
+              </div>
+            </div>
         </div>
     </main>
 
