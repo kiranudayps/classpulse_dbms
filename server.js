@@ -57,9 +57,18 @@ app.get('/api/room/:id', async (req, res) => {
 // GET /api/room/:id/schedule - Get room schedules
 app.get('/api/room/:id/schedule', async (req, res) => {
   try {
-    const [rows] = await pool.query('CALL sp_room_schedule(?)', [req.params.id]);
-    // Stored procedures return arrays of results, so we get rows[0]
-    res.json(rows[0]);
+    const [rows] = await pool.query(`
+      SELECT s.day, s.start_time, s.end_time, s.subject, s.section
+      FROM schedules s
+      JOIN classrooms c ON s.room_id = c.id
+      WHERE s.room_id = ?
+      AND NOT (
+        c.building IN ('Ramanujacharya Block', 'Madhwacharya Block')
+        AND LOWER(s.subject) LIKE '%lab%'
+      )
+      ORDER BY FIELD(s.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), s.start_time
+    `, [req.params.id]);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

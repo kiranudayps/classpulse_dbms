@@ -990,10 +990,15 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE sp_room_schedule(IN p_room_id INT)
 BEGIN
-    SELECT day, start_time, end_time, subject, section
-    FROM schedules
-    WHERE room_id = p_room_id
-    ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), start_time;
+    SELECT s.day, s.start_time, s.end_time, s.subject, s.section
+    FROM schedules s
+    JOIN classrooms c ON s.room_id = c.id
+    WHERE s.room_id = p_room_id
+      AND NOT (
+        c.building IN ('Ramanujacharya Block', 'Madhwacharya Block')
+        AND LOWER(s.subject) LIKE '%lab%'
+      )
+    ORDER BY FIELD(s.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), s.start_time;
 END $$
 DELIMITER ;
 
