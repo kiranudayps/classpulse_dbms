@@ -43,6 +43,57 @@ app.get('/api/rooms', async (req, res) => {
   }
 });
 
+// GET available rooms for a time slot
+app.get('/api/available-rooms', async (req, res) => {
+  const { day, start, end } = req.query;
+
+  if (!day || !start || !end) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
+
+  try {
+    const [rows] = await pool.query(`
+      SELECT * FROM classrooms c
+      WHERE c.id NOT IN (
+        SELECT room_id FROM schedules
+        WHERE day = ?
+        AND (
+          (? BETWEEN start_time AND end_time)
+          OR
+          (? BETWEEN start_time AND end_time)
+          OR
+          (start_time BETWEEN ? AND ?)
+        )
+      )
+      ORDER BY c.room_number
+    `, [day, start, end, start, end]);
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/book-room - Book a room
+app.post('/api/book-room', async (req, res) => {
+  const { room_number, date, start_time, end_time, subject, faculty } = req.body;
+
+  if (!room_number || !date || !start_time || !end_time || !subject) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    await pool.query(`
+      INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [room_number, date, start_time, end_time, subject, faculty]);
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/room/:id - Get a specific room
 app.get('/api/room/:id', async (req, res) => {
   try {
