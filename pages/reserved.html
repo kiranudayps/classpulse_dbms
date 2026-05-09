@@ -98,38 +98,67 @@
             if (el) el.textContent = isDark ? 'light_mode' : 'dark_mode';
         }
 
-        function renderBookings() {
+        function formatTime(t) {
+            if (!t) return '';
+            // t is HH:MM:SS or HH:MM
+            const parts = t.split(':');
+            let h = parseInt(parts[0]);
+            const m = parts[1];
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return `${h}:${m} ${ampm}`;
+        }
+
+        function formatDate(d) {
+            if (!d) return '';
+            const date = new Date(d);
+            return date.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        async function renderBookings() {
             const loading = document.getElementById('loading');
             const empty = document.getElementById('empty-state');
             const grid = document.getElementById('bookings-grid');
-            const bookings = JSON.parse(localStorage.getItem('classpulse_prebookings') || '[]');
 
-            if (loading) loading.classList.add('hidden');
-            if (!bookings.length) {
-                if (empty) empty.classList.remove('hidden');
-                if (grid) grid.classList.add('hidden');
-                return;
-            }
+            try {
+                const res = await fetch('/api/bookings');
+                const bookings = await res.json();
 
-            if (empty) empty.classList.add('hidden');
-            if (grid) {
-                grid.innerHTML = bookings.map(booking => `
-                    <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-sm">
-                        <div class="flex items-center justify-between gap-3 mb-5">
-                            <div>
-                                <p class="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">${booking.day}</p>
-                                <h2 class="text-xl font-semibold text-slate-900 dark:text-white">${booking.room}</h2>
+                if (loading) loading.classList.add('hidden');
+
+                if (!bookings.length) {
+                    if (empty) empty.classList.remove('hidden');
+                    if (grid) grid.classList.add('hidden');
+                    return;
+                }
+
+                if (empty) empty.classList.add('hidden');
+                if (grid) {
+                    grid.innerHTML = bookings.map(booking => `
+                        <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-sm">
+                            <div class="flex items-center justify-between gap-3 mb-5">
+                                <div>
+                                    <p class="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">${formatDate(booking.date)}</p>
+                                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Room ${booking.room_number}</h2>
+                                </div>
+                                <span class="inline-flex rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold uppercase">Reserved</span>
                             </div>
-                            <span class="inline-flex rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold uppercase">${booking.status ? booking.status.replace(/prebooked/i, 'Prebooked') : 'Reserved'}</span>
-                        </div>
-                        <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm">
-                            <p><span class="font-semibold text-slate-900 dark:text-white">Subject:</span> ${booking.subject}</p>
-                            <p><span class="font-semibold text-slate-900 dark:text-white">Section:</span> ${booking.section}</p>
-                            <p><span class="font-semibold text-slate-900 dark:text-white">Time:</span> ${booking.start_time} – ${booking.end_time}</p>
-                        </div>
-                    </article>
-                `).join('');
-                grid.classList.remove('hidden');
+                            <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                                <p><span class="font-semibold text-slate-900 dark:text-white">Subject:</span> ${booking.subject}</p>
+                                ${booking.faculty ? `<p><span class="font-semibold text-slate-900 dark:text-white">Faculty:</span> ${booking.faculty}</p>` : ''}
+                                <p><span class="font-semibold text-slate-900 dark:text-white">Time:</span> ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}</p>
+                            </div>
+                        </article>
+                    `).join('');
+                    grid.classList.remove('hidden');
+                }
+            } catch (err) {
+                if (loading) loading.classList.add('hidden');
+                if (empty) {
+                    empty.querySelector('h2').textContent = 'Failed to load reservations';
+                    empty.querySelector('p').textContent = 'Could not connect to the server.';
+                    empty.classList.remove('hidden');
+                }
             }
         }
 

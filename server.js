@@ -94,6 +94,20 @@ app.post('/api/book-room', async (req, res) => {
   }
 });
 
+// GET /api/bookings - Get all bookings
+app.get('/api/bookings', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT * FROM bookings
+      WHERE date >= CURDATE()
+      ORDER BY date ASC, start_time ASC
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/room/:id - Get a specific room
 app.get('/api/room/:id', async (req, res) => {
   try {
