@@ -194,4 +194,16 @@ app.get('/api/bookings', async (req, res) => {
   }
 });
 
+// DELETE /api/bookings/:id - Cancel a booking
+app.delete('/api/bookings/:id', async (req, res) => {
+  try {
+    const [result] = await pool.query('DELETE FROM bookings WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'Booking not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[API ERROR]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = app;

@@ -142,7 +142,7 @@
                 if (empty) empty.classList.add('hidden');
                 if (grid) {
                     grid.innerHTML = bookings.map(booking => `
-                        <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-sm">
+                        <article id="booking-${booking.id}" class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-sm transition-all duration-300">
                             <div class="flex items-center justify-between gap-3 mb-5">
                                 <div>
                                     <p class="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">${formatDate(booking.date)}</p>
@@ -150,11 +150,16 @@
                                 </div>
                                 <span class="inline-flex rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold uppercase">Reserved</span>
                             </div>
-                            <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                            <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm mb-5">
                                 <p><span class="font-semibold text-slate-900 dark:text-white">Subject:</span> ${booking.subject}</p>
                                 ${booking.faculty ? `<p><span class="font-semibold text-slate-900 dark:text-white">Faculty:</span> ${booking.faculty}</p>` : ''}
                                 <p><span class="font-semibold text-slate-900 dark:text-white">Time:</span> ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}</p>
                             </div>
+                            <button onclick="cancelBooking(${booking.id})"
+                                class="w-full flex items-center justify-center gap-2 border border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+                                <span class="material-symbols-outlined text-base">cancel</span>
+                                Cancel Reservation
+                            </button>
                         </article>
                     `).join('');
                     grid.classList.remove('hidden');
@@ -166,6 +171,43 @@
                     empty.querySelector('p').textContent = 'Could not connect to the server.';
                     empty.classList.remove('hidden');
                 }
+            }
+        }
+
+        async function cancelBooking(id) {
+            if (!confirm('Cancel this reservation? This cannot be undone.')) return;
+
+            try {
+                const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+
+                if (data.error) {
+                    alert('Failed to cancel: ' + data.error);
+                    return;
+                }
+
+                // Fade out and remove the card
+                const card = document.getElementById('booking-' + id);
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        card.remove();
+                        // Show empty state if no bookings left
+                        const grid = document.getElementById('bookings-grid');
+                        if (grid && grid.children.length === 0) {
+                            grid.classList.add('hidden');
+                            const empty = document.getElementById('empty-state');
+                            if (empty) {
+                                empty.querySelector('h2').textContent = 'No upcoming reservations';
+                                empty.querySelector('p').textContent = 'No classrooms have been pre-booked yet.';
+                                empty.classList.remove('hidden');
+                            }
+                        }
+                    }, 300);
+                }
+            } catch (err) {
+                alert('Failed to cancel reservation. Please try again.');
             }
         }
 
