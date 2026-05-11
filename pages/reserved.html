@@ -126,8 +126,15 @@
 
                 if (loading) loading.classList.add('hidden');
 
-                if (!bookings.length) {
-                    if (empty) empty.classList.remove('hidden');
+                if (!Array.isArray(bookings) || !bookings.length) {
+                    if (loading) loading.classList.add('hidden');
+                    if (empty) {
+                        if (!Array.isArray(bookings) && bookings.error) {
+                            empty.querySelector('h2').textContent = 'Failed to load reservations';
+                            empty.querySelector('p').textContent = 'Server error: ' + bookings.error;
+                        }
+                        empty.classList.remove('hidden');
+                    }
                     if (grid) grid.classList.add('hidden');
                     return;
                 }

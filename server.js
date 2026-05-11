@@ -30,7 +30,8 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'nie_classpulse',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  dateStrings: true
 });
 
 // GET /api/rooms - Get all rooms
