@@ -15,7 +15,8 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'nie_classpulse',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  dateStrings: true
 });
 
 // GET /api/health - Check DB connection
@@ -154,6 +155,39 @@ app.post('/api/login', async (req, res) => {
     } else {
       res.status(401).json({ error: 'Invalid login credentials' });
     }
+  } catch (err) {
+    console.error('[API ERROR]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/book-room - Pre-book a room
+app.post('/api/book-room', async (req, res) => {
+  const { room_number, date, start_time, end_time, subject, faculty } = req.body;
+
+  if (!room_number || !date || !start_time || !end_time || !subject) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    await pool.query(
+      'INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty) VALUES (?, ?, ?, ?, ?, ?)',
+      [room_number, date, start_time, end_time, subject, faculty]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[API ERROR]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/bookings - Get all upcoming bookings
+app.get('/api/bookings', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM bookings WHERE date >= CURDATE() ORDER BY date ASC, start_time ASC'
+    );
+    res.json(rows);
   } catch (err) {
     console.error('[API ERROR]', err);
     res.status(500).json({ error: err.message });
