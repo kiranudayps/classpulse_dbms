@@ -2046,6 +2046,123 @@ const LAB_DATA = [
   },
   {
     "semester": "VI",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "FSD Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.MDT + PMT",
+    "day": "Monday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "6th IS-A"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "A",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.MDT + PMT",
+    "day": "Tuesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "6th IS-A"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "FSD Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Tuesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "6th IS-B"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "B",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Wednesday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "6th IS-B"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "FSD Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Wednesday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "6th IS-C"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Thursday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "6th IS-C"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "C",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "6th IS-C"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "FSD Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Thursday",
+    "start": "14:30",
+    "end": "16:30",
+    "notes": "6th IS-D"
+  },
+  {
+    "semester": "VI",
+    "dept": "ISE",
+    "section": "D",
+    "lab_name": "ML Lab",
+    "lab_room": "CS LAB 4",
+    "batch": "All",
+    "instructors": "Dr.BMN + Dr.MDT",
+    "day": "Friday",
+    "start": "11:30",
+    "end": "13:30",
+    "notes": "6th IS-D"
+  },
+  {
+    "semester": "VI",
     "dept": "CSE",
     "section": "A",
     "lab_name": "IOT Lab",
@@ -2778,9 +2895,18 @@ let activeDay = 'all', activeSem = 'all', activeDept = 'all', searchQ = '';
 function deptMatch(dept) {
   if (activeDept === 'all') return true;
   if (activeDept === 'CSE')  return dept === 'CSE';
-  if (activeDept === 'ISE')  return dept === 'ISE';
-  if (activeDept === 'AIML') return dept === 'CSE (AI&ML)';
+  if (activeDept === 'ISE')  return dept === 'ISE' || dept === 'IS';
+  if (activeDept === 'AIML') return dept === 'CSE (AI&ML)' || dept === 'AI & ML';
   return true;
+}
+
+function semMatch(semester) {
+  if (activeSem === 'all') return true;
+  const sem = semester.toString().trim().toUpperCase();
+  if (activeSem === 'VI') return sem === 'VI' || sem === '6TH' || sem === '6';
+  if (activeSem === 'IV') return sem === 'IV' || sem === '4TH' || sem === '4';
+  if (activeSem === 'II') return sem === 'II' || sem === '2ND' || sem === '2';
+  return sem === activeSem;
 }
 
 function semLabel(s) {
@@ -2795,7 +2921,7 @@ function renderLabs() {
 
   let filtered = [...LAB_DATA];
   if (activeDay !== 'all') filtered = filtered.filter(l => l.day === activeDay);
-  if (activeSem !== 'all') filtered = filtered.filter(l => l.semester === activeSem);
+  if (activeSem !== 'all') filtered = filtered.filter(l => semMatch(l.semester));
   filtered = filtered.filter(l => deptMatch(l.dept));
   if (searchQ) {
     const q = searchQ.toLowerCase();
