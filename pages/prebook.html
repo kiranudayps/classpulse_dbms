@@ -22,6 +22,15 @@
   <meta property="og:image" content="https://nieclasspulse.vercel.app/logo.png">
   <meta property="og:url" content="https://nieclasspulse.vercel.app/pages/prebook.html">
   <meta property="og:type" content="website">
+  
+  <!-- EmailJS Library -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      emailjs.init("8VsESBdq_gvNaDYMs");
+    })();
+  </script>
+
   <style>
     body { font-family:'Lexend',sans-serif; }
     .loader { width:36px;height:36px;border:4px solid #e2e8f0;border-top-color:#137fec;border-radius:50%;animation:spin .8s linear infinite; }
@@ -289,6 +298,33 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 });
 
 
+// ===== EMAIL NOTIFICATION FUNCTION =====
+async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, faculty) {
+  try {
+    const SERVICE_ID = "service_9mw1qwt";
+    const TEMPLATE_ID = "template_y517zxq";
+    const TESTING_EMAIL = "uki.rider1@gmail.com";
+
+    const templateParams = {
+      to_name: faculty || 'Faculty',
+      email: TESTING_EMAIL,
+      room_number: roomNumber,
+      department: 'Information Science and Engineering',
+      time: startTime + ' - ' + endTime
+    };
+
+    console.log('Sending email:', templateParams);
+    const response = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
+    console.log('Email sent:', response);
+    return { success: true };
+
+  } catch (error) {
+    console.warn('Email failed (testing mode):', error.message);
+    return { success: false };
+  }
+}
+// ===== END EMAIL FUNCTION =====
+
 // BOOK FUNCTION (MYSQL)
 async function bookRoom(room, date, start, end, subject, faculty) {
 
@@ -313,8 +349,11 @@ async function bookRoom(room, date, start, end, subject, faculty) {
       return;
     }
 
+    // Send email notification
+    await sendBookingEmail(room, date, start, end, subject, faculty);
+
     document.getElementById('popup-msg').textContent =
-      `Room ${room} booked successfully`;
+      'Room ' + room + ' booked successfully!\\n(Email credentials pending - testing mode)';
 
     document.getElementById('success-popup').classList.remove('hidden');
 
