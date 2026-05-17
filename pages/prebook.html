@@ -363,15 +363,8 @@ async function bookRoom(room, date, start, end, subject, faculty) {
     
     console.log('[BOOKING] Email result:', emailResult);
 
-    // Update success popup message based on booking + email status
-    let popupMessage = 'Room ' + room + ' booked successfully!\\n';
-    if (emailResult.success) {
-      popupMessage += 'Confirmation email sent to ' + 'uki.rider1@gmail.com';
-    } else {
-      popupMessage += '⚠️ Confirmation email failed to send\\nCheck browser console for details.';
-    }
-
-    document.getElementById('popup-msg').textContent = popupMessage;
+    // Update success popup message
+    document.getElementById('popup-msg').textContent = 'Room ' + room + ' booked successfully!';
     document.getElementById('success-popup').classList.remove('hidden');
 
   } catch (err) {
