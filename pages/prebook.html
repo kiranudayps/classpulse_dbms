@@ -303,7 +303,7 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
   try {
     const SERVICE_ID = "service_9mw1qwt";
     const TEMPLATE_ID = "template_y517zxq";
-    const TESTING_EMAIL = "uki.rider1@gmail.com";
+    const TESTING_EMAIL = "uki.rider1@gmail.com"; // Hardcoded for testing as requested
 
     const templateParams = {
       to_name: faculty || 'Faculty',
@@ -313,14 +313,17 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
       time: startTime + ' - ' + endTime
     };
 
-    console.log('Sending email:', templateParams);
+    console.log('[EmailJS] Sending booking confirmation email with params:', templateParams);
     const response = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
-    console.log('Email sent:', response);
-    return { success: true };
+    console.log('[EmailJS] Email sent successfully:', response);
+    return { success: true, message: 'Email notification sent' };
 
   } catch (error) {
-    console.warn('Email failed (testing mode):', error.message);
-    return { success: false };
+    console.error('[EmailJS] Email send FAILED with error:', error);
+    console.error('[EmailJS] Error code:', error.code);
+    console.error('[EmailJS] Error type:', error.name);
+    console.error('[EmailJS] Error details:', error.text);
+    return { success: false, message: `Email failed: ${error.message}` };
   }
 }
 // ===== END EMAIL FUNCTION =====
@@ -329,6 +332,8 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
 async function bookRoom(room, date, start, end, subject, faculty) {
 
   try {
+    console.log('[BOOKING] Starting booking process for room:', room);
+    
     const res = await fetch('/api/book-room', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -345,20 +350,33 @@ async function bookRoom(room, date, start, end, subject, faculty) {
     const data = await res.json();
 
     if (data.error) {
+      console.error('[BOOKING] Booking failed:', data.error);
       alert(data.error);
       return;
     }
 
+    console.log('[BOOKING] Booking successful! Room ' + room + ' booked.');
+
     // Send email notification
-    await sendBookingEmail(room, date, start, end, subject, faculty);
+    console.log('[BOOKING] Attempting to send email...');
+    const emailResult = await sendBookingEmail(room, date, start, end, subject, faculty);
+    
+    console.log('[BOOKING] Email result:', emailResult);
 
-    document.getElementById('popup-msg').textContent =
-      'Room ' + room + ' booked successfully!\\n(Email credentials pending - testing mode)';
+    // Update success popup message based on booking + email status
+    let popupMessage = 'Room ' + room + ' booked successfully!\\n';
+    if (emailResult.success) {
+      popupMessage += 'Confirmation email sent to ' + 'uki.rider1@gmail.com';
+    } else {
+      popupMessage += '⚠️ Confirmation email failed to send\\nCheck browser console for details.';
+    }
 
+    document.getElementById('popup-msg').textContent = popupMessage;
     document.getElementById('success-popup').classList.remove('hidden');
 
   } catch (err) {
-    alert("Booking failed");
+    console.error('[BOOKING] Unexpected error:', err);
+    alert("Booking failed: " + err.message);
   }
 
 }
