@@ -356,7 +356,9 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
   try {
     const SERVICE_ID = "service_9mw1qwt";
     const TEMPLATE_ID = "template_y517zxq";
-    const TESTING_EMAIL = "uki.rider1@gmail.com"; // Hardcoded for testing as requested
+    const TESTING_EMAIL = "uki.rider1@gmail.com";
+
+    const displaySection = targetSection || 'Not specified';
 
     const templateParams = {
       to_name: faculty || 'Faculty',
@@ -364,7 +366,7 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
       room_number: roomNumber,
       department: 'Information Science and Engineering',
       time: startTime + ' - ' + endTime,
-      target_section: targetSection
+      target_section: displaySection
     };
 
     console.log('[EmailJS] Sending booking confirmation email with params:', templateParams);

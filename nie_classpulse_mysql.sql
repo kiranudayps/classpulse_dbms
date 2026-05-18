@@ -55,7 +55,7 @@ CREATE TABLE bookings (
   end_time TIME NOT NULL,
   subject VARCHAR(100) NOT NULL,
   faculty VARCHAR(100),
-  target_section VARCHAR(50) NOT NULL,
+  target_section VARCHAR(100) DEFAULT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_room_date (room_number, date)
 );

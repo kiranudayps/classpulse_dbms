@@ -165,14 +165,16 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/book-room', async (req, res) => {
   const { room_number, date, start_time, end_time, subject, faculty, target_section } = req.body;
 
-  if (!room_number || !date || !start_time || !end_time || !subject || !target_section) {
+  if (!room_number || !date || !start_time || !end_time || !subject) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+
+  const safeTargetSection = target_section || 'Not specified';
 
   try {
     await pool.query(
       'INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty, target_section) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [room_number, date, start_time, end_time, subject, faculty, target_section]
+      [room_number, date, start_time, end_time, subject, faculty, safeTargetSection]
     );
     res.json({ success: true });
   } catch (err) {
