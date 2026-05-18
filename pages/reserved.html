@@ -153,6 +153,7 @@
                             <div class="grid gap-3 text-slate-600 dark:text-slate-300 text-sm mb-5">
                                 <p><span class="font-semibold text-slate-900 dark:text-white">Subject:</span> ${booking.subject}</p>
                                 ${booking.faculty ? `<p><span class="font-semibold text-slate-900 dark:text-white">Faculty:</span> ${booking.faculty}</p>` : ''}
+                                <p><span class="font-semibold text-slate-900 dark:text-white">Booked For:</span> ${booking.target_section || 'N/A'}</p>
                                 <p><span class="font-semibold text-slate-900 dark:text-white">Time:</span> ${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}</p>
                             </div>
                             <button onclick="cancelBooking(${booking.id})"

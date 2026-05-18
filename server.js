@@ -77,17 +77,17 @@ app.get('/api/available-rooms', async (req, res) => {
 
 // POST /api/book-room - Book a room
 app.post('/api/book-room', async (req, res) => {
-  const { room_number, date, start_time, end_time, subject, faculty } = req.body;
+  const { room_number, date, start_time, end_time, subject, faculty, target_section } = req.body;
 
-  if (!room_number || !date || !start_time || !end_time || !subject) {
+  if (!room_number || !date || !start_time || !end_time || !subject || !target_section) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
     await pool.query(`
-      INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [room_number, date, start_time, end_time, subject, faculty]);
+      INSERT INTO bookings (room_number, date, start_time, end_time, subject, faculty, target_section)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [room_number, date, start_time, end_time, subject, faculty, target_section]);
 
     res.json({ success: true });
   } catch (err) {

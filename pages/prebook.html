@@ -144,6 +144,52 @@
                  class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
         </div>
 
+        <!-- Target Section -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Target Section *</label>
+          <select id="inp-target-section"
+                  class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                  required>
+            <option value="">Select target section</option>
+            <optgroup label="2nd Year / 2nd Semester">
+              <option value="2nd CSE-A">2nd CSE-A</option>
+              <option value="2nd CSE-B">2nd CSE-B</option>
+              <option value="2nd CSE-C">2nd CSE-C</option>
+              <option value="2nd CSE-D">2nd CSE-D</option>
+              <option value="2nd CSE-E">2nd CSE-E</option>
+              <option value="2nd CSE-F">2nd CSE-F</option>
+              <option value="2nd CSE-G">2nd CSE-G</option>
+              <option value="2nd CSE-H">2nd CSE-H</option>
+              <option value="2nd AIML-A">2nd AIML-A</option>
+              <option value="2nd AIML-B">2nd AIML-B</option>
+            </optgroup>
+            <optgroup label="4th Year / 4th Semester">
+              <option value="4th CSE-A">4th CSE-A</option>
+              <option value="4th CSE-B">4th CSE-B</option>
+              <option value="4th CSE-C">4th CSE-C</option>
+              <option value="4th CSE-D">4th CSE-D</option>
+              <option value="4th AIML-E">4th AIML-E</option>
+              <option value="4th AIML-F">4th AIML-F</option>
+              <option value="4th IS-A">4th IS-A</option>
+              <option value="4th IS-B">4th IS-B</option>
+              <option value="4th IS-C">4th IS-C</option>
+              <option value="4th IS-D">4th IS-D</option>
+            </optgroup>
+            <optgroup label="6th Year / 6th Semester">
+              <option value="6th CSE-A">6th CSE-A</option>
+              <option value="6th CSE-B">6th CSE-B</option>
+              <option value="6th CSE-C">6th CSE-C</option>
+              <option value="6th CSE-D">6th CSE-D</option>
+              <option value="6th IS-A">6th IS-A</option>
+              <option value="6th IS-B">6th IS-B</option>
+              <option value="6th IS-C">6th IS-C</option>
+              <option value="6th IS-D">6th IS-D</option>
+              <option value="6th AIML-E">6th AIML-E</option>
+              <option value="6th AIML-F">6th AIML-F</option>
+            </optgroup>
+          </select>
+        </div>
+
         <p id="form-error" class="text-red-500 text-xs hidden"></p>
 
         <!-- Search button -->
@@ -231,6 +277,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
   const end = document.getElementById('inp-end').value;
   const subject = document.getElementById('inp-subject').value.trim();
   const faculty = document.getElementById('inp-faculty').value.trim();
+  const targetSection = document.getElementById('inp-target-section').value;
 
   const errEl = document.getElementById('form-error');
   errEl.classList.add('hidden');
@@ -243,6 +290,12 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 
   if (!subject) {
     errEl.textContent = 'Enter subject';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  if (!targetSection) {
+    errEl.textContent = 'Select target section';
     errEl.classList.remove('hidden');
     return;
   }
@@ -282,7 +335,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
           <p class="font-bold text-lg">${r.room_number}</p>
           <p class="text-xs text-slate-500">${r.building || ''}</p>
         </div>
-        <button onclick="bookRoom('${r.room_number}', '${date}', '${start}', '${end}', '${subject}', '${faculty}')"
+        <button onclick="bookRoom('${r.room_number}', '${date}', '${start}', '${end}', '${subject}', '${faculty}', document.getElementById('inp-target-section').value)"
           class="bg-primary text-white px-4 py-2 rounded-lg">
           Book
         </button>
@@ -299,7 +352,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 
 
 // ===== EMAIL NOTIFICATION FUNCTION =====
-async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, faculty) {
+async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, faculty, targetSection) {
   try {
     const SERVICE_ID = "service_9mw1qwt";
     const TEMPLATE_ID = "template_y517zxq";
@@ -310,7 +363,8 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
       email: TESTING_EMAIL,
       room_number: roomNumber,
       department: 'Information Science and Engineering',
-      time: startTime + ' - ' + endTime
+      time: startTime + ' - ' + endTime,
+      target_section: targetSection
     };
 
     console.log('[EmailJS] Sending booking confirmation email with params:', templateParams);
@@ -329,10 +383,15 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
 // ===== END EMAIL FUNCTION =====
 
 // BOOK FUNCTION (MYSQL)
-async function bookRoom(room, date, start, end, subject, faculty) {
+async function bookRoom(room, date, start, end, subject, faculty, targetSection) {
+
+  if (!targetSection) {
+    alert('Please select a target section before booking.');
+    return;
+  }
 
   try {
-    console.log('[BOOKING] Starting booking process for room:', room);
+    console.log('[BOOKING] Starting booking process for room:', room, 'section:', targetSection);
     
     const res = await fetch('/api/book-room', {
       method: 'POST',
@@ -343,7 +402,8 @@ async function bookRoom(room, date, start, end, subject, faculty) {
         start_time: start,
         end_time: end,
         subject,
-        faculty: faculty || null
+        faculty: faculty || null,
+        target_section: targetSection
       })
     });
 
@@ -359,7 +419,7 @@ async function bookRoom(room, date, start, end, subject, faculty) {
 
     // Send email notification
     console.log('[BOOKING] Attempting to send email...');
-    const emailResult = await sendBookingEmail(room, date, start, end, subject, faculty);
+    const emailResult = await sendBookingEmail(room, date, start, end, subject, faculty, targetSection);
     
     console.log('[BOOKING] Email result:', emailResult);
 
