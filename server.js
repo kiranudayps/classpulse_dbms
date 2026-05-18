@@ -331,4 +331,40 @@ app.listen(PORT, '0.0.0.0', () => {
 // Run sync immediately on startup
 setTimeout(() => syncRoomStatus(), 3000);
 
+// -----------------------------
+// Temporary debug endpoint
+// GET /debug-db - show DB env and whether target_section column exists
+// REMOVE THIS IN PRODUCTION AFTER USE
+app.get('/debug-db', async (req, res) => {
+  try {
+    const env = {
+      DB_HOST: process.env.DB_HOST || 'undefined',
+      DB_PORT: process.env.DB_PORT || 'undefined',
+      DB_USER: process.env.DB_USER || 'undefined',
+      DB_NAME: process.env.DB_NAME || 'undefined',
+      DB_UTC: process.env.DB_UTC || 'undefined'
+    };
+
+    // Check information_schema for the column
+    const schema = process.env.DB_NAME || 'nie_classpulse';
+    const [cols] = await pool.query(
+      `SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.columns WHERE table_schema = ? AND table_name = 'bookings' AND column_name = 'target_section'`,
+      [schema]
+    );
+
+    // Also run a SHOW COLUMNS as additional verification
+    let showResult = [];
+    try {
+      const [showRows] = await pool.query("SHOW COLUMNS FROM bookings LIKE 'target_section'");
+      showResult = showRows;
+    } catch (e) {
+      showResult = { error: e.message };
+    }
+
+    res.json({ env, has_column: Array.isArray(cols) && cols.length > 0, columns: cols, show: showResult });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
 module.exports = app;
