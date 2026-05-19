@@ -374,7 +374,7 @@ async function bookRoom(room, date, start, end, subject, faculty, targetSection)
     await sendBookingEmail(room, date, start, end, subject, faculty, targetSection);
 
     document.getElementById('popup-msg').textContent =
-      'Room ' + room + ' booked successfully!\\n(Email credentials pending - testing mode)';
+      'Room ' + room + ' booked successfully!';
 
     document.getElementById('success-popup').classList.remove('hidden');
 
