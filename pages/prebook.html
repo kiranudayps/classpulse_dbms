@@ -144,49 +144,15 @@
                  class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"/>
         </div>
 
-        <!-- Target Section -->
+        <!-- Target Section *-->
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Target Section *</label>
           <select id="inp-target-section"
-                  class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
-                  required>
-            <option value="">Select target section</option>
-            <optgroup label="2nd Year / 2nd Semester">
-              <option value="2nd CSE-A">2nd CSE-A</option>
-              <option value="2nd CSE-B">2nd CSE-B</option>
-              <option value="2nd CSE-C">2nd CSE-C</option>
-              <option value="2nd CSE-D">2nd CSE-D</option>
-              <option value="2nd CSE-E">2nd CSE-E</option>
-              <option value="2nd CSE-F">2nd CSE-F</option>
-              <option value="2nd CSE-G">2nd CSE-G</option>
-              <option value="2nd CSE-H">2nd CSE-H</option>
-              <option value="2nd AIML-A">2nd AIML-A</option>
-              <option value="2nd AIML-B">2nd AIML-B</option>
-            </optgroup>
-            <optgroup label="4th Year / 4th Semester">
-              <option value="4th CSE-A">4th CSE-A</option>
-              <option value="4th CSE-B">4th CSE-B</option>
-              <option value="4th CSE-C">4th CSE-C</option>
-              <option value="4th CSE-D">4th CSE-D</option>
-              <option value="4th AIML-E">4th AIML-E</option>
-              <option value="4th AIML-F">4th AIML-F</option>
-              <option value="4th IS-A">4th IS-A</option>
-              <option value="4th IS-B">4th IS-B</option>
-              <option value="4th IS-C">4th IS-C</option>
-              <option value="4th IS-D">4th IS-D</option>
-            </optgroup>
-            <optgroup label="6th Year / 6th Semester">
-              <option value="6th CSE-A">6th CSE-A</option>
-              <option value="6th CSE-B">6th CSE-B</option>
-              <option value="6th CSE-C">6th CSE-C</option>
-              <option value="6th CSE-D">6th CSE-D</option>
-              <option value="6th IS-A">6th IS-A</option>
-              <option value="6th IS-B">6th IS-B</option>
-              <option value="6th IS-C">6th IS-C</option>
-              <option value="6th IS-D">6th IS-D</option>
-              <option value="6th AIML-E">6th AIML-E</option>
-              <option value="6th AIML-F">6th AIML-F</option>
-            </optgroup>
+                  class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+            <option value="">-- Select a section --</option>
+            <option value="2nd Year / 2nd Semester">2nd Year / 2nd Semester</option>
+            <option value="4th Year / 4th Semester">4th Year / 4th Semester</option>
+            <option value="6th Year / 6th Semester">6th Year / 6th Semester</option>
           </select>
         </div>
 
@@ -295,7 +261,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
   }
 
   if (!targetSection) {
-    errEl.textContent = 'Select target section';
+    errEl.textContent = 'Select a target section';
     errEl.classList.remove('hidden');
     return;
   }
@@ -335,7 +301,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
           <p class="font-bold text-lg">${r.room_number}</p>
           <p class="text-xs text-slate-500">${r.building || ''}</p>
         </div>
-        <button onclick="bookRoom('${r.room_number}', '${date}', '${start}', '${end}', '${subject}', '${faculty}', document.getElementById('inp-target-section').value)"
+        <button onclick="bookRoom('${r.room_number}', '${date}', '${start}', '${end}', '${subject}', '${faculty}', '${targetSection}')"
           class="bg-primary text-white px-4 py-2 rounded-lg">
           Book
         </button>
@@ -358,28 +324,23 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
     const TEMPLATE_ID = "template_y517zxq";
     const TESTING_EMAIL = "uki.rider1@gmail.com";
 
-    const displaySection = targetSection || 'Not specified';
-
     const templateParams = {
       to_name: faculty || 'Faculty',
       email: TESTING_EMAIL,
       room_number: roomNumber,
       department: 'Information Science and Engineering',
       time: startTime + ' - ' + endTime,
-      target_section: displaySection
+      target_section: targetSection || 'Not specified'
     };
 
-    console.log('[EmailJS] Sending booking confirmation email with params:', templateParams);
+    console.log('Sending email:', templateParams);
     const response = await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
-    console.log('[EmailJS] Email sent successfully:', response);
-    return { success: true, message: 'Email notification sent' };
+    console.log('Email sent:', response);
+    return { success: true };
 
   } catch (error) {
-    console.error('[EmailJS] Email send FAILED with error:', error);
-    console.error('[EmailJS] Error code:', error.code);
-    console.error('[EmailJS] Error type:', error.name);
-    console.error('[EmailJS] Error details:', error.text);
-    return { success: false, message: `Email failed: ${error.message}` };
+    console.warn('Email failed (testing mode):', error.message);
+    return { success: false };
   }
 }
 // ===== END EMAIL FUNCTION =====
@@ -387,14 +348,7 @@ async function sendBookingEmail(roomNumber, date, startTime, endTime, subject, f
 // BOOK FUNCTION (MYSQL)
 async function bookRoom(room, date, start, end, subject, faculty, targetSection) {
 
-  if (!targetSection) {
-    alert('Please select a target section before booking.');
-    return;
-  }
-
   try {
-    console.log('[BOOKING] Starting booking process for room:', room, 'section:', targetSection);
-    
     const res = await fetch('/api/book-room', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -405,33 +359,27 @@ async function bookRoom(room, date, start, end, subject, faculty, targetSection)
         end_time: end,
         subject,
         faculty: faculty || null,
-        target_section: targetSection
+        target_section: targetSection || 'Not specified'
       })
     });
 
     const data = await res.json();
 
     if (data.error) {
-      console.error('[BOOKING] Booking failed:', data.error);
       alert(data.error);
       return;
     }
 
-    console.log('[BOOKING] Booking successful! Room ' + room + ' booked.');
-
     // Send email notification
-    console.log('[BOOKING] Attempting to send email...');
-    const emailResult = await sendBookingEmail(room, date, start, end, subject, faculty, targetSection);
-    
-    console.log('[BOOKING] Email result:', emailResult);
+    await sendBookingEmail(room, date, start, end, subject, faculty, targetSection);
 
-    // Update success popup message
-    document.getElementById('popup-msg').textContent = 'Room ' + room + ' booked successfully!';
+    document.getElementById('popup-msg').textContent =
+      'Room ' + room + ' booked successfully!\\n(Email credentials pending - testing mode)';
+
     document.getElementById('success-popup').classList.remove('hidden');
 
   } catch (err) {
-    console.error('[BOOKING] Unexpected error:', err);
-    alert("Booking failed: " + err.message);
+    alert("Booking failed");
   }
 
 }
